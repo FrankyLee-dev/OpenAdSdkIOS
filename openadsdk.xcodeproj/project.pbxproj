@@ -1,0 +1,754 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 51;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9F82B7A9416F4CBF381F46C1 /* Pods_openadsdkTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E16E85D60CD6E0090C5591B1 /* Pods_openadsdkTests.framework */; };
+		D74CDF6124FDF054008868CD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D74CDF6024FDF054008868CD /* AppDelegate.m */; };
+		D74CDF6424FDF054008868CD /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D74CDF6324FDF054008868CD /* SceneDelegate.m */; };
+		D74CDF6724FDF054008868CD /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D74CDF6624FDF054008868CD /* ViewController.m */; };
+		D74CDF6A24FDF054008868CD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D74CDF6824FDF054008868CD /* Main.storyboard */; };
+		D74CDF6C24FDF055008868CD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D74CDF6B24FDF055008868CD /* Assets.xcassets */; };
+		D74CDF6F24FDF055008868CD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D74CDF6D24FDF055008868CD /* LaunchScreen.storyboard */; };
+		D74CDF7224FDF055008868CD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D74CDF7124FDF055008868CD /* main.m */; };
+		D74CDF7C24FDF055008868CD /* openadsdkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D74CDF7B24FDF055008868CD /* openadsdkTests.m */; };
+		D74CDF8724FDF055008868CD /* openadsdkUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = D74CDF8624FDF055008868CD /* openadsdkUITests.m */; };
+		D74CDF9824FDF3D9008868CD /* MsmWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D74CDF9724FDF3D9008868CD /* MsmWebViewController.m */; };
+		F4DC4CB50BA7065084E4864D /* Pods_openadsdk.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01FDFB94C8118BFC5AB4C4BC /* Pods_openadsdk.framework */; };
+		FF96B269642B3DAD3A03AB76 /* Pods_openadsdk_openadsdkUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E4D2F2B76FF0444F562C6CB /* Pods_openadsdk_openadsdkUITests.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D74CDF7824FDF055008868CD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D74CDF5424FDF054008868CD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D74CDF5B24FDF054008868CD;
+			remoteInfo = openadsdk;
+		};
+		D74CDF8324FDF055008868CD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D74CDF5424FDF054008868CD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D74CDF5B24FDF054008868CD;
+			remoteInfo = openadsdk;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		01FDFB94C8118BFC5AB4C4BC /* Pods_openadsdk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_openadsdk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0E4D2F2B76FF0444F562C6CB /* Pods_openadsdk_openadsdkUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_openadsdk_openadsdkUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B46CB95A61CB05E4C32EDD1 /* Pods-openadsdk-openadsdkUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-openadsdk-openadsdkUITests.debug.xcconfig"; path = "Target Support Files/Pods-openadsdk-openadsdkUITests/Pods-openadsdk-openadsdkUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		63B330CE4EDA35635DD8FA8E /* Pods-openadsdk.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-openadsdk.debug.xcconfig"; path = "Target Support Files/Pods-openadsdk/Pods-openadsdk.debug.xcconfig"; sourceTree = "<group>"; };
+		70AE5A8A420594B10138AF6E /* Pods-openadsdkTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-openadsdkTests.release.xcconfig"; path = "Target Support Files/Pods-openadsdkTests/Pods-openadsdkTests.release.xcconfig"; sourceTree = "<group>"; };
+		D1E2E217A064FFB0C7C3AE7F /* Pods-openadsdkTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-openadsdkTests.debug.xcconfig"; path = "Target Support Files/Pods-openadsdkTests/Pods-openadsdkTests.debug.xcconfig"; sourceTree = "<group>"; };
+		D74CDF5C24FDF054008868CD /* openadsdk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = openadsdk.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D74CDF5F24FDF054008868CD /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		D74CDF6024FDF054008868CD /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		D74CDF6224FDF054008868CD /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		D74CDF6324FDF054008868CD /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
+		D74CDF6524FDF054008868CD /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		D74CDF6624FDF054008868CD /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		D74CDF6924FDF054008868CD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D74CDF6B24FDF055008868CD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D74CDF6E24FDF055008868CD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D74CDF7024FDF055008868CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D74CDF7124FDF055008868CD /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		D74CDF7724FDF055008868CD /* openadsdkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = openadsdkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D74CDF7B24FDF055008868CD /* openadsdkTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = openadsdkTests.m; sourceTree = "<group>"; };
+		D74CDF7D24FDF055008868CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D74CDF8224FDF055008868CD /* openadsdkUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = openadsdkUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D74CDF8624FDF055008868CD /* openadsdkUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = openadsdkUITests.m; sourceTree = "<group>"; };
+		D74CDF8824FDF055008868CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D74CDF9524FDF347008868CD /* MsmPrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MsmPrefixHeader.pch; sourceTree = "<group>"; };
+		D74CDF9624FDF3D9008868CD /* MsmWebViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MsmWebViewController.h; sourceTree = "<group>"; };
+		D74CDF9724FDF3D9008868CD /* MsmWebViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MsmWebViewController.m; sourceTree = "<group>"; };
+		E16E85D60CD6E0090C5591B1 /* Pods_openadsdkTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_openadsdkTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4355E4A73334B7CF621E609 /* Pods-openadsdk-openadsdkUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-openadsdk-openadsdkUITests.release.xcconfig"; path = "Target Support Files/Pods-openadsdk-openadsdkUITests/Pods-openadsdk-openadsdkUITests.release.xcconfig"; sourceTree = "<group>"; };
+		F115D52639B48250CBE9F4CD /* Pods-openadsdk.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-openadsdk.release.xcconfig"; path = "Target Support Files/Pods-openadsdk/Pods-openadsdk.release.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D74CDF5924FDF054008868CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4DC4CB50BA7065084E4864D /* Pods_openadsdk.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D74CDF7424FDF055008868CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9F82B7A9416F4CBF381F46C1 /* Pods_openadsdkTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D74CDF7F24FDF055008868CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF96B269642B3DAD3A03AB76 /* Pods_openadsdk_openadsdkUITests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		76A499157A5B83430D9E2F6A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				01FDFB94C8118BFC5AB4C4BC /* Pods_openadsdk.framework */,
+				0E4D2F2B76FF0444F562C6CB /* Pods_openadsdk_openadsdkUITests.framework */,
+				E16E85D60CD6E0090C5591B1 /* Pods_openadsdkTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		ADB26AE8D350D3CA61CC7497 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				63B330CE4EDA35635DD8FA8E /* Pods-openadsdk.debug.xcconfig */,
+				F115D52639B48250CBE9F4CD /* Pods-openadsdk.release.xcconfig */,
+				5B46CB95A61CB05E4C32EDD1 /* Pods-openadsdk-openadsdkUITests.debug.xcconfig */,
+				E4355E4A73334B7CF621E609 /* Pods-openadsdk-openadsdkUITests.release.xcconfig */,
+				D1E2E217A064FFB0C7C3AE7F /* Pods-openadsdkTests.debug.xcconfig */,
+				70AE5A8A420594B10138AF6E /* Pods-openadsdkTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		D74CDF5324FDF054008868CD = {
+			isa = PBXGroup;
+			children = (
+				D74CDF5E24FDF054008868CD /* openadsdk */,
+				D74CDF7A24FDF055008868CD /* openadsdkTests */,
+				D74CDF8524FDF055008868CD /* openadsdkUITests */,
+				D74CDF5D24FDF054008868CD /* Products */,
+				ADB26AE8D350D3CA61CC7497 /* Pods */,
+				76A499157A5B83430D9E2F6A /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		D74CDF5D24FDF054008868CD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D74CDF5C24FDF054008868CD /* openadsdk.app */,
+				D74CDF7724FDF055008868CD /* openadsdkTests.xctest */,
+				D74CDF8224FDF055008868CD /* openadsdkUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D74CDF5E24FDF054008868CD /* openadsdk */ = {
+			isa = PBXGroup;
+			children = (
+				D74CDF9424FDF23E008868CD /* webview */,
+				D74CDF5F24FDF054008868CD /* AppDelegate.h */,
+				D74CDF6024FDF054008868CD /* AppDelegate.m */,
+				D74CDF6224FDF054008868CD /* SceneDelegate.h */,
+				D74CDF6324FDF054008868CD /* SceneDelegate.m */,
+				D74CDF6524FDF054008868CD /* ViewController.h */,
+				D74CDF6624FDF054008868CD /* ViewController.m */,
+				D74CDF6824FDF054008868CD /* Main.storyboard */,
+				D74CDF6B24FDF055008868CD /* Assets.xcassets */,
+				D74CDF6D24FDF055008868CD /* LaunchScreen.storyboard */,
+				D74CDF7024FDF055008868CD /* Info.plist */,
+				D74CDF7124FDF055008868CD /* main.m */,
+			);
+			path = openadsdk;
+			sourceTree = "<group>";
+		};
+		D74CDF7A24FDF055008868CD /* openadsdkTests */ = {
+			isa = PBXGroup;
+			children = (
+				D74CDF7B24FDF055008868CD /* openadsdkTests.m */,
+				D74CDF7D24FDF055008868CD /* Info.plist */,
+			);
+			path = openadsdkTests;
+			sourceTree = "<group>";
+		};
+		D74CDF8524FDF055008868CD /* openadsdkUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D74CDF8624FDF055008868CD /* openadsdkUITests.m */,
+				D74CDF8824FDF055008868CD /* Info.plist */,
+			);
+			path = openadsdkUITests;
+			sourceTree = "<group>";
+		};
+		D74CDF9424FDF23E008868CD /* webview */ = {
+			isa = PBXGroup;
+			children = (
+				D74CDF9524FDF347008868CD /* MsmPrefixHeader.pch */,
+				D74CDF9624FDF3D9008868CD /* MsmWebViewController.h */,
+				D74CDF9724FDF3D9008868CD /* MsmWebViewController.m */,
+			);
+			path = webview;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D74CDF5B24FDF054008868CD /* openadsdk */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D74CDF8B24FDF055008868CD /* Build configuration list for PBXNativeTarget "openadsdk" */;
+			buildPhases = (
+				ED9BB9FD83FFDB9238D622CF /* [CP] Check Pods Manifest.lock */,
+				D74CDF5824FDF054008868CD /* Sources */,
+				D74CDF5924FDF054008868CD /* Frameworks */,
+				D74CDF5A24FDF054008868CD /* Resources */,
+				8DC6300D677A4F4AFA35F162 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = openadsdk;
+			productName = openadsdk;
+			productReference = D74CDF5C24FDF054008868CD /* openadsdk.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D74CDF7624FDF055008868CD /* openadsdkTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D74CDF8E24FDF055008868CD /* Build configuration list for PBXNativeTarget "openadsdkTests" */;
+			buildPhases = (
+				1572E5707AD9C564049B24B3 /* [CP] Check Pods Manifest.lock */,
+				D74CDF7324FDF055008868CD /* Sources */,
+				D74CDF7424FDF055008868CD /* Frameworks */,
+				D74CDF7524FDF055008868CD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D74CDF7924FDF055008868CD /* PBXTargetDependency */,
+			);
+			name = openadsdkTests;
+			productName = openadsdkTests;
+			productReference = D74CDF7724FDF055008868CD /* openadsdkTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D74CDF8124FDF055008868CD /* openadsdkUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D74CDF9124FDF055008868CD /* Build configuration list for PBXNativeTarget "openadsdkUITests" */;
+			buildPhases = (
+				F984B970D81BBFAD47393098 /* [CP] Check Pods Manifest.lock */,
+				D74CDF7E24FDF055008868CD /* Sources */,
+				D74CDF7F24FDF055008868CD /* Frameworks */,
+				D74CDF8024FDF055008868CD /* Resources */,
+				8AB5C26CC4E097DB01485C1A /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D74CDF8424FDF055008868CD /* PBXTargetDependency */,
+			);
+			name = openadsdkUITests;
+			productName = openadsdkUITests;
+			productReference = D74CDF8224FDF055008868CD /* openadsdkUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D74CDF5424FDF054008868CD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1110;
+				ORGANIZATIONNAME = "Franky Lee";
+				TargetAttributes = {
+					D74CDF5B24FDF054008868CD = {
+						CreatedOnToolsVersion = 11.1;
+					};
+					D74CDF7624FDF055008868CD = {
+						CreatedOnToolsVersion = 11.1;
+						TestTargetID = D74CDF5B24FDF054008868CD;
+					};
+					D74CDF8124FDF055008868CD = {
+						CreatedOnToolsVersion = 11.1;
+						TestTargetID = D74CDF5B24FDF054008868CD;
+					};
+				};
+			};
+			buildConfigurationList = D74CDF5724FDF054008868CD /* Build configuration list for PBXProject "openadsdk" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D74CDF5324FDF054008868CD;
+			productRefGroup = D74CDF5D24FDF054008868CD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D74CDF5B24FDF054008868CD /* openadsdk */,
+				D74CDF7624FDF055008868CD /* openadsdkTests */,
+				D74CDF8124FDF055008868CD /* openadsdkUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D74CDF5A24FDF054008868CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D74CDF6F24FDF055008868CD /* LaunchScreen.storyboard in Resources */,
+				D74CDF6C24FDF055008868CD /* Assets.xcassets in Resources */,
+				D74CDF6A24FDF054008868CD /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D74CDF7524FDF055008868CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D74CDF8024FDF055008868CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1572E5707AD9C564049B24B3 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-openadsdkTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8AB5C26CC4E097DB01485C1A /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-openadsdk-openadsdkUITests/Pods-openadsdk-openadsdkUITests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-openadsdk-openadsdkUITests/Pods-openadsdk-openadsdkUITests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-openadsdk-openadsdkUITests/Pods-openadsdk-openadsdkUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8DC6300D677A4F4AFA35F162 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-openadsdk/Pods-openadsdk-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-openadsdk/Pods-openadsdk-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-openadsdk/Pods-openadsdk-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		ED9BB9FD83FFDB9238D622CF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-openadsdk-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F984B970D81BBFAD47393098 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-openadsdk-openadsdkUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D74CDF5824FDF054008868CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D74CDF6724FDF054008868CD /* ViewController.m in Sources */,
+				D74CDF9824FDF3D9008868CD /* MsmWebViewController.m in Sources */,
+				D74CDF6124FDF054008868CD /* AppDelegate.m in Sources */,
+				D74CDF7224FDF055008868CD /* main.m in Sources */,
+				D74CDF6424FDF054008868CD /* SceneDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D74CDF7324FDF055008868CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D74CDF7C24FDF055008868CD /* openadsdkTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D74CDF7E24FDF055008868CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D74CDF8724FDF055008868CD /* openadsdkUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D74CDF7924FDF055008868CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D74CDF5B24FDF054008868CD /* openadsdk */;
+			targetProxy = D74CDF7824FDF055008868CD /* PBXContainerItemProxy */;
+		};
+		D74CDF8424FDF055008868CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D74CDF5B24FDF054008868CD /* openadsdk */;
+			targetProxy = D74CDF8324FDF055008868CD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D74CDF6824FDF054008868CD /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D74CDF6924FDF054008868CD /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		D74CDF6D24FDF055008868CD /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D74CDF6E24FDF055008868CD /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D74CDF8924FDF055008868CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		D74CDF8A24FDF055008868CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D74CDF8C24FDF055008868CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 63B330CE4EDA35635DD8FA8E /* Pods-openadsdk.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = openadsdk/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zhichan.openadsdk;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D74CDF8D24FDF055008868CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F115D52639B48250CBE9F4CD /* Pods-openadsdk.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = openadsdk/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zhichan.openadsdk;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D74CDF8F24FDF055008868CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D1E2E217A064FFB0C7C3AE7F /* Pods-openadsdkTests.debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = openadsdkTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zhichan.openadsdkTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/openadsdk.app/openadsdk";
+			};
+			name = Debug;
+		};
+		D74CDF9024FDF055008868CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 70AE5A8A420594B10138AF6E /* Pods-openadsdkTests.release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = openadsdkTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zhichan.openadsdkTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/openadsdk.app/openadsdk";
+			};
+			name = Release;
+		};
+		D74CDF9224FDF055008868CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5B46CB95A61CB05E4C32EDD1 /* Pods-openadsdk-openadsdkUITests.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = openadsdkUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zhichan.openadsdkUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = openadsdk;
+			};
+			name = Debug;
+		};
+		D74CDF9324FDF055008868CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E4355E4A73334B7CF621E609 /* Pods-openadsdk-openadsdkUITests.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = openadsdkUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zhichan.openadsdkUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = openadsdk;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D74CDF5724FDF054008868CD /* Build configuration list for PBXProject "openadsdk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D74CDF8924FDF055008868CD /* Debug */,
+				D74CDF8A24FDF055008868CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D74CDF8B24FDF055008868CD /* Build configuration list for PBXNativeTarget "openadsdk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D74CDF8C24FDF055008868CD /* Debug */,
+				D74CDF8D24FDF055008868CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D74CDF8E24FDF055008868CD /* Build configuration list for PBXNativeTarget "openadsdkTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D74CDF8F24FDF055008868CD /* Debug */,
+				D74CDF9024FDF055008868CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D74CDF9124FDF055008868CD /* Build configuration list for PBXNativeTarget "openadsdkUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D74CDF9224FDF055008868CD /* Debug */,
+				D74CDF9324FDF055008868CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D74CDF5424FDF054008868CD /* Project object */;
+}
