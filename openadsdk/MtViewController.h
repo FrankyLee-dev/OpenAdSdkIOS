@@ -1,5 +1,5 @@
 //
-//  SceneDelegate.h
+//  MtViewController.h
 //  openadsdk
 //
 //  Created by Franky Lee on 2020/9/1.
@@ -8,9 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SceneDelegate : UIResponder <UIWindowSceneDelegate>
+NS_ASSUME_NONNULL_BEGIN
 
-@property (strong, nonatomic) UIWindow * window;
+@interface MtViewController : UIViewController
 
 @end
 
+NS_ASSUME_NONNULL_END

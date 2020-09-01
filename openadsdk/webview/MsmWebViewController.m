@@ -66,6 +66,7 @@
                    forKeyPath:@"title"
                       options:NSKeyValueObservingOptionNew
                       context:nil];
+    
 }
 - (void)viewSafeAreaInsetsDidChange {
     [super viewSafeAreaInsetsDidChange];
@@ -92,8 +93,7 @@
     goBackButton.frame = CGRectMake(0, 0, 30, StatusBarAndNavigationBarHeight);
     UIBarButtonItem * goBackButtonItem = [[UIBarButtonItem alloc] initWithCustomView:goBackButton];
     
-    UIBarButtonItem * jstoOc = [[UIBarButtonItem alloc] initWithTitle:@"首页" style:UIBarButtonItemStyleDone target:self action:@selector(localHtmlClicked)];
-    self.navigationItem.leftBarButtonItems = @[goBackButtonItem,jstoOc];
+    self.navigationItem.leftBarButtonItems = @[goBackButtonItem];
     
     // 刷新按钮
     UIButton * refreshButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -102,8 +102,7 @@
     refreshButton.frame = CGRectMake(0, 0, 30, StatusBarAndNavigationBarHeight);
     UIBarButtonItem * refreshButtonItem = [[UIBarButtonItem alloc] initWithCustomView:refreshButton];
     
-    UIBarButtonItem * ocToJs = [[UIBarButtonItem alloc] initWithTitle:@"OC调用JS" style:UIBarButtonItemStyleDone target:self action:@selector(ocToJs)];
-    self.navigationItem.rightBarButtonItems = @[refreshButtonItem, ocToJs];
+    self.navigationItem.rightBarButtonItems = @[refreshButtonItem];
     
     self.navigationController.navigationBar.translucent = YES;
 }
@@ -112,11 +111,7 @@
 - (void)goBackAction:(id)sender{
     [_webView goBack];
 }
-- (void)localHtmlClicked{
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"JStoOC.html" ofType:nil];
-    NSString *htmlString = [[NSString alloc]initWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
-    [_webView loadHTMLString:htmlString baseURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]]];
-}
+
 - (void)refreshAction:(id)sender{
     [_webView reload];
 }
@@ -202,15 +197,14 @@
         //设置是否允许画中画技术 在特定设备上有效
         config.allowsPictureInPictureMediaPlayback = YES;
         //设置请求的User-Agent信息中应用程序名称 iOS9后可用
-        config.applicationNameForUserAgent = @"ChinaDailyForiPad";
+        config.applicationNameForUserAgent = @"msmds";
         
         //自定义的WKScriptMessageHandler 是为了解决内存不释放的问题
         WeakWebViewScriptMessageDelegate *weakScriptMessageDelegate = [[WeakWebViewScriptMessageDelegate alloc] initWithDelegate:self];
         //这个类主要用来做native与JavaScript的交互管理
         WKUserContentController * wkUController = [[WKUserContentController alloc] init];
         //注册一个name为jsToOcNoPrams的js方法 设置处理接收JS方法的对象
-        [wkUController addScriptMessageHandler:weakScriptMessageDelegate  name:@"jsToOcNoPrams"];
-        [wkUController addScriptMessageHandler:weakScriptMessageDelegate  name:@"jsToOcWithPrams"];
+//        [wkUController addScriptMessageHandler:weakScriptMessageDelegate  name:@"msmdsInjected"];
         
         config.userContentController = wkUController;
         
@@ -230,14 +224,10 @@
         //可返回的页面列表, 存储已打开过的网页
         // WKBackForwardList * backForwardList = [_webView backForwardList];
         
-        //        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://www.chinadaily.com.cn"]];
-        //        [request addValue:[self readCurrentCookieWithDomain:@"http://www.chinadaily.com.cn"] forHTTPHeaderField:@"Cookie"];
-        //        [_webView loadRequest:request];
-        
-        
-        NSString *path = [[NSBundle mainBundle] pathForResource:@"JStoOC.html" ofType:nil];
-        NSString *htmlString = [[NSString alloc]initWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
-        [_webView loadHTMLString:htmlString baseURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]]];
+        NSString *urlStr = @"https://wxapp.msmds.cn/h5/react_web/newSign";
+        NSURL *url = [NSURL URLWithString:urlStr];
+        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
+        [_webView loadRequest:request];
         
     }
     return _webView;
@@ -303,7 +293,7 @@
     //用message.body获得JS传出的参数体
     NSDictionary * parameter = message.body;
     //JS调用OC
-    if([message.name isEqualToString:@"jsToOcNoPrams"]){
+    if([message.name isEqualToString:@"msmdsInjected"]){
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"js调用到了oc" message:@"不带参数" preferredStyle:UIAlertControllerStyleAlert];
         [alertController addAction:([UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         }])];
@@ -357,26 +347,8 @@
     
     NSString * urlStr = navigationAction.request.URL.absoluteString;
     NSLog(@"发送跳转请求：%@",urlStr);
-    //自己定义的协议头
-    NSString *htmlHeadString = @"github://";
-    if([urlStr hasPrefix:htmlHeadString]){
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"通过截取URL调用OC" message:@"你想前往我的Github主页?" preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addAction:([UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-            
-        }])];
-        [alertController addAction:([UIAlertAction actionWithTitle:@"打开" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            NSURL * url = [NSURL URLWithString:[urlStr stringByReplacingOccurrencesOfString:@"github://callName_?" withString:@""]];
-            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-            
-        }])];
-        [self presentViewController:alertController animated:YES completion:nil];
-        
-        decisionHandler(WKNavigationActionPolicyCancel);
-        
-    }else{
-        decisionHandler(WKNavigationActionPolicyAllow);
-    }
     
+    decisionHandler(WKNavigationActionPolicyAllow);
     
 }
 
@@ -387,7 +359,7 @@
     //允许跳转
     decisionHandler(WKNavigationResponsePolicyAllow);
     //不允许跳转
-    //decisionHandler(WKNavigationResponsePolicyCancel);
+//    decisionHandler(WKNavigationResponsePolicyCancel);
 }
 
 //需要响应身份验证时调用 同样在block中需要传入用户身份凭证
