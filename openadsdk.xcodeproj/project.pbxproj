@@ -19,6 +19,7 @@
 		D761008624FE2438006085F8 /* Resource in Resources */ = {isa = PBXBuildFile; fileRef = D761008524FE2438006085F8 /* Resource */; };
 		D761008D24FE2C91006085F8 /* MtViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D761008C24FE2C91006085F8 /* MtViewController.m */; };
 		D761008F24FE55AE006085F8 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D761008E24FE55AE006085F8 /* Images.xcassets */; };
+		D76EE6AC25009E5E005E887E /* BUDExpressBannerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D76EE6AB25009E5E005E887E /* BUDExpressBannerViewController.m */; };
 		F4DC4CB50BA7065084E4864D /* Pods_openadsdk.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01FDFB94C8118BFC5AB4C4BC /* Pods_openadsdk.framework */; };
 		FF96B269642B3DAD3A03AB76 /* Pods_openadsdk_openadsdkUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E4D2F2B76FF0444F562C6CB /* Pods_openadsdk_openadsdkUITests.framework */; };
 /* End PBXBuildFile section */
@@ -69,6 +70,9 @@
 		D761008B24FE2C91006085F8 /* MtViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MtViewController.h; sourceTree = "<group>"; };
 		D761008C24FE2C91006085F8 /* MtViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MtViewController.m; sourceTree = "<group>"; };
 		D761008E24FE55AE006085F8 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		D76EE6AA25009E5E005E887E /* BUDExpressBannerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BUDExpressBannerViewController.h; sourceTree = "<group>"; };
+		D76EE6AB25009E5E005E887E /* BUDExpressBannerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BUDExpressBannerViewController.m; sourceTree = "<group>"; };
+		D76EE6B42500DE8D005E887E /* BUDMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BUDMacros.h; sourceTree = "<group>"; };
 		E16E85D60CD6E0090C5591B1 /* Pods_openadsdkTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_openadsdkTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4355E4A73334B7CF621E609 /* Pods-openadsdk-openadsdkUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-openadsdk-openadsdkUITests.release.xcconfig"; path = "Target Support Files/Pods-openadsdk-openadsdkUITests/Pods-openadsdk-openadsdkUITests.release.xcconfig"; sourceTree = "<group>"; };
 		F115D52639B48250CBE9F4CD /* Pods-openadsdk.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-openadsdk.release.xcconfig"; path = "Target Support Files/Pods-openadsdk/Pods-openadsdk.release.xcconfig"; sourceTree = "<group>"; };
@@ -151,6 +155,8 @@
 		D74CDF5E24FDF054008868CD /* openadsdk */ = {
 			isa = PBXGroup;
 			children = (
+				D76EE6B32500DE79005E887E /* Macros */,
+				D76EE6A925008841005E887E /* adview */,
 				D74CDF9424FDF23E008868CD /* webview */,
 				D74CDF5F24FDF054008868CD /* AppDelegate.h */,
 				D74CDF6024FDF054008868CD /* AppDelegate.m */,
@@ -193,6 +199,23 @@
 				D74CDF9724FDF3D9008868CD /* MsmWebViewController.m */,
 			);
 			path = webview;
+			sourceTree = "<group>";
+		};
+		D76EE6A925008841005E887E /* adview */ = {
+			isa = PBXGroup;
+			children = (
+				D76EE6B42500DE8D005E887E /* BUDMacros.h */,
+				D76EE6AA25009E5E005E887E /* BUDExpressBannerViewController.h */,
+				D76EE6AB25009E5E005E887E /* BUDExpressBannerViewController.m */,
+			);
+			path = adview;
+			sourceTree = "<group>";
+		};
+		D76EE6B32500DE79005E887E /* Macros */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Macros;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -434,6 +457,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D76EE6AC25009E5E005E887E /* BUDExpressBannerViewController.m in Sources */,
 				D74CDF9824FDF3D9008868CD /* MsmWebViewController.m in Sources */,
 				D74CDF6124FDF054008868CD /* AppDelegate.m in Sources */,
 				D74CDF7224FDF055008868CD /* main.m in Sources */,

@@ -9,6 +9,8 @@
 #import "MsmWebViewController.h"
 #import <WebKit/WebKit.h>
 #import "MsmPrefixHeader.pch"
+#import <BUAdSDK/BUNativeExpressBannerView.h>
+#import <BUAdSDK/BUAdSDK.h>
 
 // WKWebView 内存不释放的问题解决
 @interface WeakWebViewScriptMessageDelegate : NSObject<WKScriptMessageHandler>
@@ -41,11 +43,18 @@
 
 @end
 
-@interface MsmWebViewController ()<WKScriptMessageHandler, WKUIDelegate, WKNavigationDelegate>
+@interface MsmWebViewController ()<
+    WKScriptMessageHandler,
+    WKUIDelegate,
+    WKNavigationDelegate,
+    BUNativeExpressBannerViewDelegate>
 
 @property (nonatomic, strong) WKWebView *  webView;
 //网页加载进度视图
 @property (nonatomic, strong) UIProgressView * progressView;
+
+// 广告view
+@property(nonatomic, strong) BUNativeExpressBannerView *bannerView;
 
 @end
 
@@ -66,6 +75,8 @@
                    forKeyPath:@"title"
                       options:NSKeyValueObservingOptionNew
                       context:nil];
+    
+    [self loadData];
     
 }
 - (void)viewSafeAreaInsetsDidChange {
@@ -203,8 +214,8 @@
         WeakWebViewScriptMessageDelegate *weakScriptMessageDelegate = [[WeakWebViewScriptMessageDelegate alloc] initWithDelegate:self];
         //这个类主要用来做native与JavaScript的交互管理
         WKUserContentController * wkUController = [[WKUserContentController alloc] init];
-        //注册一个name为jsToOcNoPrams的js方法 设置处理接收JS方法的对象
-//        [wkUController addScriptMessageHandler:weakScriptMessageDelegate  name:@"msmdsInjected"];
+        //注册一个name为showToutiaoBannerAd的js方法 设置处理接收JS方法的对象
+        [wkUController addScriptMessageHandler:weakScriptMessageDelegate  name:@"showToutiaoBannerAd"];
         
         config.userContentController = wkUController;
         
@@ -228,6 +239,7 @@
         NSURL *url = [NSURL URLWithString:urlStr];
         NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
         [_webView loadRequest:request];
+        
         
     }
     return _webView;
@@ -289,21 +301,16 @@
 //被自定义的WKScriptMessageHandler在回调方法里通过代理回调回来，绕了一圈就是为了解决内存不释放的问题
 //通过接收JS传出消息的name进行捕捉的回调方法
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message{
+    NSLog(@"userContentController:%@",@"didReceiveScriptMessage");
     NSLog(@"name:%@\\\\n body:%@\\\\n frameInfo:%@\\\\n",message.name,message.body,message.frameInfo);
     //用message.body获得JS传出的参数体
     NSDictionary * parameter = message.body;
     //JS调用OC
-    if([message.name isEqualToString:@"msmdsInjected"]){
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"js调用到了oc" message:@"不带参数" preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addAction:([UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        }])];
-        [self presentViewController:alertController animated:YES completion:nil];
+    if([message.name isEqualToString:@"showToutiaoBannerAd"]){
+        NSLog(@"userContentController:%@",@"showToutiaoBannerAd------");
         
-    }else if([message.name isEqualToString:@"jsToOcWithPrams"]){
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"js调用到了oc" message:parameter[@"params"] preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addAction:([UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        }])];
-        [self presentViewController:alertController animated:YES completion:nil];
+    }else if([message.name isEqualToString:@"dismissToutiaoBannerAd"]){
+        
     }
     
 }
@@ -431,6 +438,60 @@
     // Dispose of any resources that can be recreated.
 }
 
+
+- (void)loadData {
+    
+    CGFloat screenWidth = CGRectGetWidth([UIScreen mainScreen].bounds) - 40;
+    CGFloat bannerHeigh = screenWidth/600*300;
+    [self.bannerView removeFromSuperview];
+    self.bannerView = [[BUNativeExpressBannerView alloc] initWithSlotID:@"945413865" rootViewController:self adSize:CGSizeMake(screenWidth, bannerHeigh) IsSupportDeepLink:YES interval:30];
+    self.bannerView.frame = CGRectMake(0, 300, screenWidth, bannerHeigh);
+    self.bannerView.delegate = self;
+  
+    [self.bannerView loadAdData];
+}
+
+#pragma BUNativeExpressBannerViewDelegate
+
+- (void)nativeExpressBannerAdViewDidLoad:(BUNativeExpressBannerView *)bannerAdView {
+    NSLog(@"%s",__func__);
+}
+
+- (void)nativeExpressBannerAdView:(BUNativeExpressBannerView *)bannerAdView didLoadFailWithError:(NSError *)error {
+    NSLog(@"%s",__func__);
+}
+
+- (void)nativeExpressBannerAdViewRenderSuccess:(BUNativeExpressBannerView *)bannerAdView {
+    NSLog(@"%s",__func__);
+    CGFloat height = bannerAdView.bounds.size.height;
+    NSString *strheight = [NSString stringWithFormat:@"%g",height];
+    [self.webView.scrollView addSubview:self.bannerView];
+    NSLog(@"%@",strheight);
+}
+
+- (void)nativeExpressBannerAdViewRenderFail:(BUNativeExpressBannerView *)bannerAdView error:(NSError *)error {
+    NSLog(@"%s",__func__);
+}
+
+- (void)nativeExpressBannerAdViewWillBecomVisible:(BUNativeExpressBannerView *)bannerAdView {
+    NSLog(@"%s",__func__);
+}
+
+- (void)nativeExpressBannerAdViewDidClick:(BUNativeExpressBannerView *)bannerAdView {
+    NSLog(@"%s",__func__);
+}
+
+- (void)nativeExpressBannerAdView:(BUNativeExpressBannerView *)bannerAdView dislikeWithReason:(NSArray<BUDislikeWords *> *)filterwords {
+    NSLog(@"%s",__func__);
+    [UIView animateWithDuration:0.25 animations:^{
+        bannerAdView.alpha = 0;
+    } completion:^(BOOL finished) {
+        [bannerAdView removeFromSuperview];
+        if (self.bannerView == bannerAdView) {
+            self.bannerView = nil;
+        }
+    }];
+}
 
 
 @end

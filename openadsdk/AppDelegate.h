@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <BUAdSDK/BUSplashAdView.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate, BUSplashAdDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
