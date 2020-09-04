@@ -11,6 +11,8 @@
 #import "MsmPrefixHeader.pch"
 #import <BUAdSDK/BUNativeExpressBannerView.h>
 #import <BUAdSDK/BUAdSDK.h>
+#import <BUAdSDK/BUNativeExpressAdManager.h>
+#import <BUAdSDK/BUNativeExpressAdView.h>
 
 // WKWebView 内存不释放的问题解决
 @interface WeakWebViewScriptMessageDelegate : NSObject<WKScriptMessageHandler>
@@ -47,14 +49,23 @@
     WKScriptMessageHandler,
     WKUIDelegate,
     WKNavigationDelegate,
-    BUNativeExpressBannerViewDelegate>
+    BUNativeExpressBannerViewDelegate,
+    BUNativeExpressAdViewDelegate,
+    BUNativeExpressRewardedVideoAdDelegate
+>
 
-@property (nonatomic, strong) WKWebView *  webView;
+@property(nonatomic, strong) WKWebView *webView;
 //网页加载进度视图
-@property (nonatomic, strong) UIProgressView * progressView;
-
-// 广告view
+@property(nonatomic, strong) UIProgressView *progressView;
+// banner广告view
 @property(nonatomic, strong) BUNativeExpressBannerView *bannerView;
+// 信息流广告
+@property (strong, nonatomic) NSMutableArray<__kindof BUNativeExpressAdView *> *expressAdViews;
+@property (strong, nonatomic) BUNativeExpressAdManager *nativeExpressAdManager;
+@property(nonatomic, copy) NSString *nativeTop;
+@property(nonatomic, copy) NSString *nativeLeft;
+// 激励视频
+@property (nonatomic, strong) BUNativeExpressRewardedVideoAd *rewardedAd;
 
 @end
 
@@ -64,6 +75,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupNavigationItem];
+    self.expressAdViews = [NSMutableArray new];
     [self.view addSubview:self.webView];
     [self.view addSubview:self.progressView];
     //添加监测网页加载进度的观察者
@@ -76,8 +88,6 @@
                       options:NSKeyValueObservingOptionNew
                       context:nil];
     
-    [self loadData];
-    
 }
 - (void)viewSafeAreaInsetsDidChange {
     [super viewSafeAreaInsetsDidChange];
@@ -86,8 +96,12 @@
 }
 - (void)dealloc{
     //移除注册的js方法
-    [[_webView configuration].userContentController removeScriptMessageHandlerForName:@"jsToOcNoPrams"];
-    [[_webView configuration].userContentController removeScriptMessageHandlerForName:@"jsToOcWithPrams"];
+    [[_webView configuration].userContentController removeScriptMessageHandlerForName:@"showToutiaoBannerAd"];
+    [[_webView configuration].userContentController removeScriptMessageHandlerForName:@"dismissToutiaoBannerAd"];
+    [[_webView configuration].userContentController removeScriptMessageHandlerForName:@"showToutiaoNativeAd"];
+    [[_webView configuration].userContentController removeScriptMessageHandlerForName:@"dismissToutiaoNativeAd"];
+    [[_webView configuration].userContentController removeScriptMessageHandlerForName:@"loadToutiaoRewardVideoAd"];
+    [[_webView configuration].userContentController removeScriptMessageHandlerForName:@"playToutiaoRewardVideoAd"];
     //移除观察者
     [_webView removeObserver:self
                   forKeyPath:NSStringFromSelector(@selector(estimatedProgress))];
@@ -115,7 +129,7 @@
     
     self.navigationItem.rightBarButtonItems = @[refreshButtonItem];
     
-    self.navigationController.navigationBar.translucent = YES;
+    self.navigationController.navigationBar.translucent = NO;
 }
 
 #pragma mark - Event Handle
@@ -125,26 +139,6 @@
 
 - (void)refreshAction:(id)sender{
     [_webView reload];
-}
-
-//OC调用JS
-- (void)ocToJs{
-    //changeColor()是JS方法名，completionHandler是异步回调block
-    NSString *jsString = [NSString stringWithFormat:@"changeColor('%@')", @"Js颜色参数"];
-    [_webView evaluateJavaScript:jsString completionHandler:^(id _Nullable data, NSError * _Nullable error) {
-        NSLog(@"改变HTML的背景色");
-    }];
-    
-    //改变字体大小 调用原生JS方法
-    NSString *jsFont = [NSString stringWithFormat:@"document.getElementsByTagName('body')[0].style.webkitTextSizeAdjust= '%d%%'", arc4random()%99 + 100];
-    [_webView evaluateJavaScript:jsFont completionHandler:nil];
-    
-    NSString * path =  [[NSBundle mainBundle] pathForResource:@"girl" ofType:@"png"];
-    NSString *jsPicture = [NSString stringWithFormat:@"changePicture('%@','%@')", @"pictureId",path];
-    [_webView evaluateJavaScript:jsPicture completionHandler:^(id _Nullable data, NSError * _Nullable error) {
-        NSLog(@"切换本地头像");
-    }];
-    
 }
 
 #pragma mark - KVO
@@ -216,6 +210,13 @@
         WKUserContentController * wkUController = [[WKUserContentController alloc] init];
         //注册一个name为showToutiaoBannerAd的js方法 设置处理接收JS方法的对象
         [wkUController addScriptMessageHandler:weakScriptMessageDelegate  name:@"showToutiaoBannerAd"];
+        [wkUController addScriptMessageHandler:weakScriptMessageDelegate  name:@"dismissToutiaoBannerAd"];
+        
+        [wkUController addScriptMessageHandler:weakScriptMessageDelegate  name:@"showToutiaoNativeAd"];
+        [wkUController addScriptMessageHandler:weakScriptMessageDelegate  name:@"dismissToutiaoNativeAd"];
+        
+        [wkUController addScriptMessageHandler:weakScriptMessageDelegate  name:@"loadToutiaoRewardVideoAd"];
+        [wkUController addScriptMessageHandler:weakScriptMessageDelegate  name:@"playToutiaoRewardVideoAd"];
         
         config.userContentController = wkUController;
         
@@ -234,8 +235,9 @@
         _webView.allowsBackForwardNavigationGestures = YES;
         //可返回的页面列表, 存储已打开过的网页
         // WKBackForwardList * backForwardList = [_webView backForwardList];
-        
-        NSString *urlStr = @"https://wxapp.msmds.cn/h5/react_web/newSign";
+        // http://192.168.0.222:8080/newSign
+        // https://wxapp.msmds.cn/h5/react_web/newSign
+        NSString *urlStr = @"http://192.168.0.222:8080/newSign";
         NSURL *url = [NSURL URLWithString:urlStr];
         NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
         [_webView loadRequest:request];
@@ -301,18 +303,78 @@
 //被自定义的WKScriptMessageHandler在回调方法里通过代理回调回来，绕了一圈就是为了解决内存不释放的问题
 //通过接收JS传出消息的name进行捕捉的回调方法
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message{
-    NSLog(@"userContentController:%@",@"didReceiveScriptMessage");
-    NSLog(@"name:%@\\\\n body:%@\\\\n frameInfo:%@\\\\n",message.name,message.body,message.frameInfo);
-    //用message.body获得JS传出的参数体
-    NSDictionary * parameter = message.body;
     //JS调用OC
-    if([message.name isEqualToString:@"showToutiaoBannerAd"]){
-        NSLog(@"userContentController:%@",@"showToutiaoBannerAd------");
-        
-    }else if([message.name isEqualToString:@"dismissToutiaoBannerAd"]){
-        
+    @try {
+        if([message.name isEqualToString:@"showToutiaoBannerAd"]){
+            NSLog(@"userContentController:%@",@"showToutiaoBannerAd------");
+            // 解析style，加载显示banner广告
+            //用message.body获得JS传出的参数体
+            NSString * parameter = message.body;
+            NSDictionary * adStyleData = [self dictionaryWithJsonString:parameter];
+            NSDictionary *data = [adStyleData objectForKey:@"style"];
+            if (data != nil) {
+                NSString *top = [data objectForKey:@"top"];
+                NSString *left = [data objectForKey:@"left"];
+                NSString *width = [data objectForKey:@"width"];
+                NSString *height = [data objectForKey:@"height"];
+                [self loadData:top:left:width:height];
+            }
+        }else if([message.name isEqualToString:@"dismissToutiaoBannerAd"]){
+            // 移除banner广告
+            NSLog(@"userContentController:%@",@"dismissToutiaoBannerAd------");
+            [self.bannerView removeFromSuperview];
+        } else if ([message.name isEqualToString:@"showToutiaoNativeAd"]) {
+            NSLog(@"userContentController:%@",@"showToutiaoNativeAd------");
+            // 解析style，加载显示信息流广告
+            NSString * parameter = message.body;
+            NSDictionary * adStyleData = [self dictionaryWithJsonString:parameter];
+            NSDictionary *data = [adStyleData objectForKey:@"style"];
+            if (data != nil) {
+                self.nativeTop = [data objectForKey:@"top"];
+                self.nativeLeft = [data objectForKey:@"left"];
+                NSString *top = [data objectForKey:@"top"];
+                NSString *left = [data objectForKey:@"left"];
+                NSString *width = [data objectForKey:@"width"];
+                NSString *height = [data objectForKey:@"height"];
+                [self loadNativeData:top:left:width:height];
+            }
+        } else if ([message.name isEqualToString:@"dismissToutiaoNativeAd"]) {
+            NSLog(@"userContentController:%@",@"dismissToutiaoNativeAd------");
+            // 移除信息流广告
+            BUNativeExpressAdView *expressAdView = [self.expressAdViews firstObject];
+            [expressAdView removeFromSuperview];
+            [self.expressAdViews removeAllObjects];
+
+        } else if ([message.name isEqualToString:@"loadToutiaoRewardVideoAd"]) {
+            NSLog(@"userContentController:%@",@"loadToutiaoRewardVideoAd------");
+            // 加载激励视频
+            [self loadRewardVideoAdWithSlotID:@"945198260"];
+        } else if ([message.name isEqualToString:@"playToutiaoRewardVideoAd"]) {
+            NSLog(@"userContentController:%@",@"playToutiaoRewardVideoAd------");
+            // 播放激励视频
+            [self showRewardVideoAd];
+        }
+    } @catch (NSException *exception) {
+        NSLog(@"NSException%@",exception);
+    } @finally {
+        NSLog(@"@finally%@",@"");
     }
     
+}
+- (NSDictionary *)dictionaryWithJsonString:(NSString *)jsonString {
+    if (jsonString == nil) {
+        return nil;
+    }
+    NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *err;
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
+                                                        options:NSJSONReadingMutableContainers
+                                                          error:&err];
+    if(err) {
+        NSLog(@"json解析失败：%@",err);
+        return nil;
+    }
+    return dic;
 }
 
 #pragma mark - WKNavigationDelegate
@@ -326,6 +388,7 @@
 
 // 页面加载失败时调用
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(null_unspecified WKNavigation *)navigation withError:(NSError *)error {
+    NSLog(@"didFailProvisionalNavigation:%@", error);
     [self.progressView setProgress:0.0f animated:NO];
 }
 
@@ -337,6 +400,12 @@
 // 页面加载完成之后调用
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [self getCookie];
+    // 禁止webview缩放
+    NSString *injectionJSString = @"var script = document.createElement('meta');"
+    "script.name = 'viewport';"
+    "script.content=\"width=device-width, user-scalable=no\";"
+    "document.getElementsByTagName('head')[0].appendChild(script);";
+    [webView evaluateJavaScript:injectionJSString completionHandler:nil];
 }
 
 //提交发生错误时调用
@@ -439,19 +508,21 @@
 }
 
 
-- (void)loadData {
+#pragma BUNativeExpressBannerViewDelegate
+- (void)loadData:(NSString *)top :(NSString *)left :(NSString *)width :(NSString *)height {
     
-    CGFloat screenWidth = CGRectGetWidth([UIScreen mainScreen].bounds) - 40;
-    CGFloat bannerHeigh = screenWidth/600*300;
+    CGFloat marginTop = [top floatValue];
+    CGFloat marginLeft = [left floatValue];
+    CGFloat screenWidth = [width floatValue];
+    CGFloat bannerHeigh = [height floatValue];
+    
     [self.bannerView removeFromSuperview];
-    self.bannerView = [[BUNativeExpressBannerView alloc] initWithSlotID:@"945413865" rootViewController:self adSize:CGSizeMake(screenWidth, bannerHeigh) IsSupportDeepLink:YES interval:30];
-    self.bannerView.frame = CGRectMake(0, 300, screenWidth, bannerHeigh);
+    self.bannerView = [[BUNativeExpressBannerView alloc] initWithSlotID:@"945413865" rootViewController:self adSize:CGSizeMake(screenWidth, bannerHeigh) IsSupportDeepLink:YES];
+    self.bannerView.frame = CGRectMake(marginLeft, marginTop, screenWidth, bannerHeigh);
     self.bannerView.delegate = self;
   
     [self.bannerView loadAdData];
 }
-
-#pragma BUNativeExpressBannerViewDelegate
 
 - (void)nativeExpressBannerAdViewDidLoad:(BUNativeExpressBannerView *)bannerAdView {
     NSLog(@"%s",__func__);
@@ -459,14 +530,15 @@
 
 - (void)nativeExpressBannerAdView:(BUNativeExpressBannerView *)bannerAdView didLoadFailWithError:(NSError *)error {
     NSLog(@"%s",__func__);
+    [_webView evaluateJavaScript:@"javascript:window.BannerLoadError();" completionHandler:nil];
 }
 
 - (void)nativeExpressBannerAdViewRenderSuccess:(BUNativeExpressBannerView *)bannerAdView {
     NSLog(@"%s",__func__);
     CGFloat height = bannerAdView.bounds.size.height;
-    NSString *strheight = [NSString stringWithFormat:@"%g",height];
     [self.webView.scrollView addSubview:self.bannerView];
-    NSLog(@"%@",strheight);
+    NSString *jsStr = [NSString stringWithFormat:@"javascript:window.BannerLoadSuccess({height:%g});",height];
+    [_webView evaluateJavaScript:jsStr completionHandler:nil];
 }
 
 - (void)nativeExpressBannerAdViewRenderFail:(BUNativeExpressBannerView *)bannerAdView error:(NSError *)error {
@@ -483,6 +555,7 @@
 
 - (void)nativeExpressBannerAdView:(BUNativeExpressBannerView *)bannerAdView dislikeWithReason:(NSArray<BUDislikeWords *> *)filterwords {
     NSLog(@"%s",__func__);
+    [_webView evaluateJavaScript:@"javascript:window.BannerHideManually();" completionHandler:nil];
     [UIView animateWithDuration:0.25 animations:^{
         bannerAdView.alpha = 0;
     } completion:^(BOOL finished) {
@@ -493,5 +566,194 @@
     }];
 }
 
+
+#pragma BUNativeExpressAdViewDelegate
+// 信息流广告
+- (void)loadNativeData:(NSString *)top :(NSString *)left :(NSString *)width :(NSString *)height {
+    
+    CGFloat screenWidth = [width floatValue];
+    CGFloat bannerHeigh = [height floatValue];
+    if (!self.expressAdViews) {
+        self.expressAdViews = [NSMutableArray arrayWithCapacity:20];
+    }
+    BUAdSlot *slot1 = [[BUAdSlot alloc] init];
+    slot1.ID = @"945198258";
+    slot1.AdType = BUAdSlotAdTypeFeed;
+    BUSize *imgSize = [BUSize sizeBy:BUProposalSize_Feed228_150];
+    slot1.imgSize = imgSize;
+    slot1.position = BUAdSlotPositionFeed;
+    slot1.isSupportDeepLink = YES;
+    
+    // self.nativeExpressAdManager可以重用
+    if (!self.nativeExpressAdManager) {
+        self.nativeExpressAdManager = [[BUNativeExpressAdManager alloc] initWithSlot:slot1 adSize:CGSizeMake(screenWidth, bannerHeigh)];
+    }
+    self.nativeExpressAdManager.adSize = CGSizeMake(screenWidth, bannerHeigh);
+    self.nativeExpressAdManager.delegate = self;
+    [self.nativeExpressAdManager loadAd:1];
+}
+
+- (void)nativeExpressAdSuccessToLoad:(BUNativeExpressAdManager *)nativeExpressAd views:(NSArray<__kindof BUNativeExpressAdView *> *)views {
+    BUNativeExpressAdView *expressAdView = [self.expressAdViews firstObject];
+    [expressAdView removeFromSuperview];
+    [self.expressAdViews removeAllObjects];//【重要】不能保存太多view，需要在合适的时机手动释放不用的，否则内存会过大
+    if (views.count) {
+        [self.expressAdViews addObjectsFromArray:views];
+        [views enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            BUNativeExpressAdView *expressView = (BUNativeExpressAdView *)obj;
+            expressView.rootViewController = self;
+            // important: 此处会进行WKWebview的渲染，建议一次最多预加载三个广告，如果超过3个会很大概率导致WKWebview渲染失败。
+            [expressView render];
+        }];
+    }
+
+}
+
+- (void)nativeExpressAdFailToLoad:(BUNativeExpressAdManager *)nativeExpressAd error:(NSError *)error {
+    [_webView evaluateJavaScript:@"javascript:window.NativeError();" completionHandler:nil];
+}
+
+- (void)nativeExpressAdViewRenderSuccess:(BUNativeExpressAdView *)nativeExpressAdView {
+    CGFloat marginTop = [self.nativeTop floatValue];
+    CGFloat marginLeft = [self.nativeLeft floatValue];
+    nativeExpressAdView.frame = CGRectMake(marginLeft, marginTop, nativeExpressAdView.bounds.size.width, nativeExpressAdView.bounds.size.height);
+    [self.webView.scrollView addSubview:nativeExpressAdView];
+    [_webView evaluateJavaScript:@"javascript:window.NativeRenderSuccess();" completionHandler:nil];
+}
+
+- (void)nativeExpressAdView:(BUNativeExpressAdView *)nativeExpressAdView stateDidChanged:(BUPlayerPlayState)playerState {
+//    NSLog(@"====== %p playerState = %ld",nativeExpressAdView,(long)playerState);
+
+}
+
+- (void)nativeExpressAdViewRenderFail:(BUNativeExpressAdView *)nativeExpressAdView error:(NSError *)error {
+    
+}
+
+- (void)nativeExpressAdViewWillShow:(BUNativeExpressAdView *)nativeExpressAdView {
+    
+}
+
+- (void)nativeExpressAdViewDidClick:(BUNativeExpressAdView *)nativeExpressAdView {
+    
+}
+
+- (void)nativeExpressAdViewPlayerDidPlayFinish:(BUNativeExpressAdView *)nativeExpressAdView error:(NSError *)error {
+    
+}
+
+- (void)nativeExpressAdView:(BUNativeExpressAdView *)nativeExpressAdView dislikeWithReason:(NSArray<BUDislikeWords *> *)filterWords {//【重要】需要在点击叉以后 在这个回调中移除视图，否则，会出现用户点击叉无效的情况
+    [nativeExpressAdView removeFromSuperview];
+    [self.expressAdViews removeAllObjects];
+    [_webView evaluateJavaScript:@"javascript:window.NativeShield();" completionHandler:nil];
+}
+
+- (void)nativeExpressAdViewDidClosed:(BUNativeExpressAdView *)nativeExpressAdView {
+    
+}
+
+- (void)nativeExpressAdViewWillPresentScreen:(BUNativeExpressAdView *)nativeExpressAdView {
+    
+}
+
+- (void)nativeExpressAdViewDidCloseOtherController:(BUNativeExpressAdView *)nativeExpressAdView interactionType:(BUInteractionType)interactionType {
+    NSString *str = nil;
+    if (interactionType == BUInteractionTypePage) {
+        str = @"ladingpage";
+    } else if (interactionType == BUInteractionTypeVideoAdDetail) {
+        str = @"videoDetail";
+    } else {
+        str = @"appstoreInApp";
+    }
+}
+
+#pragma BUNativeExpressRewardedVideoAdDelegate
+// 激励视频
+- (void)loadRewardVideoAdWithSlotID:(NSString *)slotID {
+    BURewardedVideoModel *model = [[BURewardedVideoModel alloc] init];
+    model.userId = @"13374";
+    self.rewardedAd = [[BUNativeExpressRewardedVideoAd alloc] initWithSlotID:slotID rewardedVideoModel:model];
+    self.rewardedAd.delegate = self;
+    [self.rewardedAd loadAdData];
+    //为保证播放流畅建议可在收到视频下载完成回调后再展示视频。
+}
+// 播放视频
+- (void)showRewardVideoAd {
+    if (self.rewardedAd) {
+        [self.rewardedAd showAdFromRootViewController:self];
+    }
+}
+
+- (void)nativeExpressRewardedVideoAdDidLoad:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd {
+    
+}
+
+- (void)nativeExpressRewardedVideoAd:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd didFailWithError:(NSError *_Nullable)error {
+    [_webView evaluateJavaScript:@"javascript:window.onRewardError();" completionHandler:nil];
+}
+
+- (void)nativeExpressRewardedVideoAdCallback:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd withType:(BUNativeExpressRewardedVideoAdType)nativeExpressVideoType{
+    
+}
+
+- (void)nativeExpressRewardedVideoAdDidDownLoadVideo:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd {
+    
+}
+
+- (void)nativeExpressRewardedVideoAdViewRenderSuccess:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd {
+    
+}
+
+- (void)nativeExpressRewardedVideoAdViewRenderFail:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd error:(NSError *_Nullable)error {
+    
+}
+
+- (void)nativeExpressRewardedVideoAdWillVisible:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd {
+    
+}
+
+- (void)nativeExpressRewardedVideoAdDidVisible:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd {
+    
+}
+
+- (void)nativeExpressRewardedVideoAdWillClose:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd {
+    
+}
+
+- (void)nativeExpressRewardedVideoAdDidClose:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd {
+    
+}
+
+- (void)nativeExpressRewardedVideoAdDidClick:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd {
+    
+}
+
+- (void)nativeExpressRewardedVideoAdDidClickSkip:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd {
+    
+}
+
+- (void)nativeExpressRewardedVideoAdDidPlayFinish:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd didFailWithError:(NSError *_Nullable)error {
+    
+}
+
+- (void)nativeExpressRewardedVideoAdServerRewardDidSucceed:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd verify:(BOOL)verify {
+    [_webView evaluateJavaScript:@"javascript:window.onRewardVerify();" completionHandler:nil];
+}
+
+- (void)nativeExpressRewardedVideoAdServerRewardDidFail:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd error:(NSError * _Nullable)error {
+    
+}
+
+- (void)nativeExpressRewardedVideoAdDidCloseOtherController:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd interactionType:(BUInteractionType)interactionType {
+    NSString *str = nil;
+    if (interactionType == BUInteractionTypePage) {
+        str = @"ladingpage";
+    } else if (interactionType == BUInteractionTypeVideoAdDetail) {
+        str = @"videoDetail";
+    } else {
+        str = @"appstoreInApp";
+    }
+    
+}
 
 @end
