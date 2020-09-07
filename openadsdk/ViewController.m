@@ -17,7 +17,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self setupNavigationItem];
+    [self setView];
     
     UIButton * button = [UIButton buttonWithType:UIButtonTypeSystem];
     button.frame=CGRectMake((UIScreen.mainScreen.bounds.size.width-140)/2, 200, 140, 30);
@@ -33,13 +33,16 @@
 
 // 打开签到页
 -(void)openIntegral{
+    // http://192.168.0.222:8080/newSign
+    // https://wxapp.msmds.cn/h5/react_web/newSign
     MsmWebViewController *msmWebController = [MsmWebViewController new];
-    [self.navigationController pushViewController:msmWebController animated:NO];
+    msmWebController.url = @"http://192.168.0.222:8080/newSign";
+    [self.navigationController pushViewController:msmWebController animated:YES];
     
 }
 
-- (void)setupNavigationItem{
-    self.title = @"demo test";
+- (void)setView {
+    [self.navigationController.navigationBar setTranslucent:YES];
     self.view.backgroundColor = [UIColor whiteColor];
 }
 

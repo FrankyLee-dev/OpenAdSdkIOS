@@ -13,6 +13,9 @@
 #import <BUAdSDK/BUAdSDK.h>
 #import <BUAdSDK/BUNativeExpressAdManager.h>
 #import <BUAdSDK/BUNativeExpressAdView.h>
+#import "PopoverView.h"
+
+#define URL_define @"URL"
 
 // WKWebView 内存不释放的问题解决
 @interface WeakWebViewScriptMessageDelegate : NSObject<WKScriptMessageHandler>
@@ -51,7 +54,8 @@
     WKNavigationDelegate,
     BUNativeExpressBannerViewDelegate,
     BUNativeExpressAdViewDelegate,
-    BUNativeExpressRewardedVideoAdDelegate
+    BUNativeExpressRewardedVideoAdDelegate,
+    PopoverViewDelegate
 >
 
 @property(nonatomic, strong) WKWebView *webView;
@@ -74,7 +78,8 @@
 #pragma mark - Override
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self setupNavigationItem];
+    [self setUpNavigationBar];
+    [self setupNavigationItem: NO];
     self.expressAdViews = [NSMutableArray new];
     [self.view addSubview:self.webView];
     [self.view addSubview:self.progressView];
@@ -88,11 +93,16 @@
                       options:NSKeyValueObservingOptionNew
                       context:nil];
     
+    [self.webView addObserver:self
+                   forKeyPath:URL_define
+                      options:NSKeyValueObservingOptionNew
+                      context:nil];
+    
 }
 - (void)viewSafeAreaInsetsDidChange {
     [super viewSafeAreaInsetsDidChange];
-    UIEdgeInsets insets = self.view.safeAreaInsets;
-    self.progressView.frame = CGRectMake(0, insets.top + 2, self.view.frame.size.width, 2);
+//    UIEdgeInsets insets = self.view.safeAreaInsets;
+    self.progressView.frame = CGRectMake(0, 0, self.view.frame.size.width, 3);
 }
 - (void)dealloc{
     //移除注册的js方法
@@ -107,29 +117,63 @@
                   forKeyPath:NSStringFromSelector(@selector(estimatedProgress))];
     [_webView removeObserver:self
                   forKeyPath:NSStringFromSelector(@selector(title))];
+    [_webView removeObserver:self
+                  forKeyPath:URL_define];
+}
+
+#pragma mark - NavigationBar
+- (void)setUpNavigationBar{
+    // navigationBar背景色
+    [self.navigationController.navigationBar setBarTintColor:MsmNavigationBarColor];
+    // 控件颜色
+    [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
+    // 设置标题
+    [self.navigationController.navigationBar setTitleTextAttributes:@{
+        NSFontAttributeName:[UIFont systemFontOfSize: 16 weight:UIFontWeightMedium],
+        NSForegroundColorAttributeName:[UIColor whiteColor]
+    }];
+    // 默认（YES）
+    [self.navigationController.navigationBar setTranslucent:NO];
+    // 去除导航栏底部黑色
+    [self.navigationController.navigationBar setShadowImage:[[UIImage alloc] init]];
+    
+    // 更多按钮
+    UIButton * moreButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [moreButton setImage:[[UIImage imageNamed:@"msm_more.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [moreButton addTarget:self action:@selector(moreAction:) forControlEvents:UIControlEventTouchUpInside];
+    moreButton.frame = CGRectMake(0, 0, 20, StatusBarAndNavigationBarHeight);
+    UIBarButtonItem * moreButtonItem = [[UIBarButtonItem alloc] initWithCustomView:moreButton];
+    
+    self.navigationItem.rightBarButtonItems = @[moreButtonItem];
 }
 
 #pragma mark - UI
-- (void)setupNavigationItem{
-    // 后退按钮
-    UIButton * goBackButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [goBackButton setImage:[UIImage imageNamed:@"backbutton"] forState:UIControlStateNormal];
-    [goBackButton addTarget:self action:@selector(goBackAction:) forControlEvents:UIControlEventTouchUpInside];
-    goBackButton.frame = CGRectMake(0, 0, 30, StatusBarAndNavigationBarHeight);
-    UIBarButtonItem * goBackButtonItem = [[UIBarButtonItem alloc] initWithCustomView:goBackButton];
+- (void)setupNavigationItem:(BOOL)showBack{
     
-    self.navigationItem.leftBarButtonItems = @[goBackButtonItem];
+    UIButton * exitButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [exitButton setImage:[[UIImage imageNamed:@"msm_cancel.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [exitButton addTarget:self action:@selector(exitAction:) forControlEvents:UIControlEventTouchUpInside];
     
-    // 刷新按钮
-    UIButton * refreshButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [refreshButton setImage:[UIImage imageNamed:@"webRefreshButton"] forState:UIControlStateNormal];
-    [refreshButton addTarget:self action:@selector(refreshAction:) forControlEvents:UIControlEventTouchUpInside];
-    refreshButton.frame = CGRectMake(0, 0, 30, StatusBarAndNavigationBarHeight);
-    UIBarButtonItem * refreshButtonItem = [[UIBarButtonItem alloc] initWithCustomView:refreshButton];
+    if (showBack) {
+        // 后退按钮
+        UIButton * goBackButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        goBackButton.frame = CGRectMake(0, 0, 20, StatusBarAndNavigationBarHeight);
+        [goBackButton setImage:[[UIImage imageNamed:@"msm_back.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+        [goBackButton addTarget:self action:@selector(goBackAction:) forControlEvents:UIControlEventTouchUpInside];
+        UIBarButtonItem * goBackButtonItem = [[UIBarButtonItem alloc] initWithCustomView:goBackButton];
+        
+        // 退出按钮
+        exitButton.frame = CGRectMake(40, 0, 60, StatusBarAndNavigationBarHeight);
+        UIBarButtonItem * exitButtonItem = [[UIBarButtonItem alloc] initWithCustomView:exitButton];
+        self.navigationItem.leftBarButtonItems = @[goBackButtonItem, exitButtonItem];
+    } else {
+        // 退出按钮
+        exitButton.frame = CGRectMake(0, 0, 20, StatusBarAndNavigationBarHeight);
+        UIBarButtonItem * exitButtonItem = [[UIBarButtonItem alloc] initWithCustomView:exitButton];
+        self.navigationItem.leftBarButtonItems = @[exitButtonItem];
+    }
     
-    self.navigationItem.rightBarButtonItems = @[refreshButtonItem];
     
-    self.navigationController.navigationBar.translucent = NO;
 }
 
 #pragma mark - Event Handle
@@ -137,8 +181,24 @@
     [_webView goBack];
 }
 
-- (void)refreshAction:(id)sender{
-    [_webView reload];
+- (void)moreAction:(id)sender{
+    [self popSubView];
+}
+// 退出
+- (void)exitAction:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+// 弹窗菜单
+- (void)popSubView{
+    CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+    CGPoint point = CGPointMake(screenWidth-30, (StatusBarAndNavigationBarHeight+StatusBarHeight)/2-2);
+    PopoverView *view = [[PopoverView alloc]initWithPoint:point
+                                                   titles:@[@"刷新网页", @"复制链接", @"清除缓存", @"在浏览器打开"]
+                                               imageNames:nil];
+    view.delegate = self;
+    [view show];
+    
 }
 
 #pragma mark - KVO
@@ -162,7 +222,10 @@
     }else if([keyPath isEqualToString:@"title"]
              && object == _webView){
         self.navigationItem.title = _webView.title;
-    }else{
+    } else if([keyPath isEqualToString:@"URL"]){
+        NSLog(@" 当前 URL------%@",_webView.URL.absoluteString);
+        [self setupNavigationItem:![_webView.URL.absoluteString isEqualToString:_url]];
+    } else{
         [super observeValueForKeyPath:keyPath
                              ofObject:object
                                change:change
@@ -173,8 +236,8 @@
 #pragma mark - Getter
 - (UIProgressView *)progressView {
     if (!_progressView){
-        _progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(0, StatusBarAndNavigationBarHeight + 2, self.view.frame.size.width, 2)];
-        _progressView.tintColor = [UIColor blueColor];
+        _progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 3)];
+        _progressView.tintColor = [UIColor greenColor];
         _progressView.trackTintColor = [UIColor clearColor];
     }
     return _progressView;
@@ -226,7 +289,7 @@
         WKUserScript *wkUScript = [[WKUserScript alloc] initWithSource:jSString injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
         [config.userContentController addUserScript:wkUScript];
         
-        _webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT) configuration:config];
+        _webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-StatusBarAndNavigationBarHeight+BottomSafeAreaHeight) configuration:config];
         // UI代理
         _webView.UIDelegate = self;
         // 导航代理
@@ -235,9 +298,7 @@
         _webView.allowsBackForwardNavigationGestures = YES;
         //可返回的页面列表, 存储已打开过的网页
         // WKBackForwardList * backForwardList = [_webView backForwardList];
-        // http://192.168.0.222:8080/newSign
-        // https://wxapp.msmds.cn/h5/react_web/newSign
-        NSString *urlStr = @"http://192.168.0.222:8080/newSign";
+        NSString *urlStr = _url;
         NSURL *url = [NSURL URLWithString:urlStr];
         NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
         [_webView loadRequest:request];
@@ -423,8 +484,16 @@
     
     NSString * urlStr = navigationAction.request.URL.absoluteString;
     NSLog(@"发送跳转请求：%@",urlStr);
-    
-    decisionHandler(WKNavigationActionPolicyAllow);
+    if (navigationAction.navigationType == WKNavigationTypeLinkActivated) {
+        //跳转别的应用如系统浏览器
+        // 对于跨域，需要手动跳转
+        [[UIApplication sharedApplication] openURL:navigationAction.request.URL options:@{} completionHandler:nil];
+        // 不允许web内跳转
+        decisionHandler(WKNavigationActionPolicyCancel);
+    } else {//应用的web内跳转
+        decisionHandler (WKNavigationActionPolicyAllow);
+    }
+    return;
     
 }
 
@@ -754,6 +823,63 @@
         str = @"appstoreInApp";
     }
     
+}
+
+#pragma mark - PopoverViewDelegate
+- (void)didSelectedRowAtIndex:(NSInteger)index{
+    
+    if (index == 0) {
+        // 刷新网页
+        [_webView reload];
+    } else if(index == 1){
+        // 复制链接
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        [pasteboard setString:_url];
+        [self showAlert:@"复制成功"];
+    } else if (index == 2) {
+        // 清空缓存
+        [self cleanCache];
+    } else if (index == 3) {
+        // 在浏览器打开
+        NSURL *originalURL =[NSURL URLWithString:_url];
+        [[UIApplication sharedApplication]openURL:originalURL options:@{} completionHandler:nil];
+    }
+}
+
+// 清除webview缓存
+- (void)cleanCache {
+    if ([[[UIDevice currentDevice]systemVersion]intValue ] >= 9.0) {
+        NSArray * types =@[WKWebsiteDataTypeMemoryCache,WKWebsiteDataTypeDiskCache]; // 9.0之后才有的
+        NSSet *websiteDataTypes = [NSSet setWithArray:types];
+        NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
+        [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{
+            [self showAlert:@"清除缓存成功"];
+        }];
+    }else{
+        NSString *libraryPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,NSUserDomainMask,YES) objectAtIndex:0];
+        NSString *cookiesFolderPath = [libraryPath stringByAppendingString:@"/Cookies"];
+        NSLog(@"%@", cookiesFolderPath);
+        NSError *errors;
+        [[NSFileManager defaultManager] removeItemAtPath:cookiesFolderPath error:&errors];
+        [self showAlert:@"清除缓存成功"];
+    }
+}
+
+// 提示弹窗
+- (IBAction)showAlert:(NSString *)msg {
+    //显示提示框
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"提示"
+                                                                   message:msg
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {
+                                                              //响应事件
+                                                              NSLog(@"action = %@", action);
+                                                          }];
+   
+    [alert addAction:defaultAction];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 @end
