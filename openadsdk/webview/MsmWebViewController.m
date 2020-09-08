@@ -445,6 +445,12 @@
 
 // 页面开始加载时调用
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
+    // 禁止webview缩放
+    NSString *injectionJSString = @"var script = document.createElement('meta');"
+    "script.name = 'viewport';"
+    "script.content=\"width=device-width, user-scalable=no\";"
+    "document.getElementsByTagName('head')[0].appendChild(script);";
+    [webView evaluateJavaScript:injectionJSString completionHandler:nil];
 }
 
 // 页面加载失败时调用
@@ -461,12 +467,6 @@
 // 页面加载完成之后调用
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [self getCookie];
-    // 禁止webview缩放
-    NSString *injectionJSString = @"var script = document.createElement('meta');"
-    "script.name = 'viewport';"
-    "script.content=\"width=device-width, user-scalable=no\";"
-    "document.getElementsByTagName('head')[0].appendChild(script);";
-    [webView evaluateJavaScript:injectionJSString completionHandler:nil];
 }
 
 //提交发生错误时调用
@@ -839,6 +839,7 @@
     } else if (index == 2) {
         // 清空缓存
         [self cleanCache];
+        [_webView evaluateJavaScript:@"javascript:window.localStorage.clear()" completionHandler:nil];
     } else if (index == 3) {
         // 在浏览器打开
         NSURL *originalURL =[NSURL URLWithString:_url];

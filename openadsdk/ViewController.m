@@ -36,7 +36,7 @@
     // http://192.168.0.222:8080/newSign
     // https://wxapp.msmds.cn/h5/react_web/newSign
     MsmWebViewController *msmWebController = [MsmWebViewController new];
-    msmWebController.url = @"http://192.168.0.222:8080/newSign";
+    msmWebController.url = @"https://wxapp.msmds.cn/h5/react_web/newSign";
     [self.navigationController pushViewController:msmWebController animated:YES];
     
 }
