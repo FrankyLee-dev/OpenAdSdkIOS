@@ -14,6 +14,7 @@
 #import <BUAdSDK/BUNativeExpressAdManager.h>
 #import <BUAdSDK/BUNativeExpressAdView.h>
 #import "PopoverView.h"
+#import "UIViewController+Hidden.h"
 
 #define URL_define @"URL"
 
@@ -99,6 +100,17 @@
                       context:nil];
     
 }
+
+// 是否显示navigationbar
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    if (!_showToolbar) {
+        //设置代理即可
+        self.navigationController.delegate = self;
+    }
+}
+
 - (void)viewSafeAreaInsetsDidChange {
     [super viewSafeAreaInsetsDidChange];
 //    UIEdgeInsets insets = self.view.safeAreaInsets;
@@ -126,11 +138,11 @@
     // navigationBar背景色
     [self.navigationController.navigationBar setBarTintColor:MsmNavigationBarColor];
     // 控件颜色
-    [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
+    [self.navigationController.navigationBar setTintColor:[UIColor blackColor]];
     // 设置标题
     [self.navigationController.navigationBar setTitleTextAttributes:@{
         NSFontAttributeName:[UIFont systemFontOfSize: 16 weight:UIFontWeightMedium],
-        NSForegroundColorAttributeName:[UIColor whiteColor]
+        NSForegroundColorAttributeName:[UIColor blackColor]
     }];
     // 默认（YES）
     [self.navigationController.navigationBar setTranslucent:NO];
@@ -289,7 +301,7 @@
         WKUserScript *wkUScript = [[WKUserScript alloc] initWithSource:jSString injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
         [config.userContentController addUserScript:wkUScript];
         
-        _webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-StatusBarAndNavigationBarHeight+BottomSafeAreaHeight) configuration:config];
+        _webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-(_showToolbar ? StatusBarAndNavigationBarHeight : 0)+BottomSafeAreaHeight) configuration:config];
         // UI代理
         _webView.UIDelegate = self;
         // 导航代理
@@ -409,7 +421,7 @@
         } else if ([message.name isEqualToString:@"loadToutiaoRewardVideoAd"]) {
             NSLog(@"userContentController:%@",@"loadToutiaoRewardVideoAd------");
             // 加载激励视频
-            [self loadRewardVideoAdWithSlotID:@"945198260"];
+            [self loadRewardVideoAdWithSlotID:_rewardVideoCodeId];
         } else if ([message.name isEqualToString:@"playToutiaoRewardVideoAd"]) {
             NSLog(@"userContentController:%@",@"playToutiaoRewardVideoAd------");
             // 播放激励视频
@@ -445,12 +457,7 @@
 
 // 页面开始加载时调用
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
-    // 禁止webview缩放
-    NSString *injectionJSString = @"var script = document.createElement('meta');"
-    "script.name = 'viewport';"
-    "script.content=\"width=device-width, user-scalable=no\";"
-    "document.getElementsByTagName('head')[0].appendChild(script);";
-    [webView evaluateJavaScript:injectionJSString completionHandler:nil];
+    
 }
 
 // 页面加载失败时调用
@@ -467,6 +474,12 @@
 // 页面加载完成之后调用
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [self getCookie];
+    // 禁止webview缩放
+    NSString *injectionJSString = @"var script = document.createElement('meta');"
+    "script.name = 'viewport';"
+    "script.content=\"width=device-width, user-scalable=no\";"
+    "document.getElementsByTagName('head')[0].appendChild(script);";
+    [webView evaluateJavaScript:injectionJSString completionHandler:nil];
 }
 
 //提交发生错误时调用
@@ -586,7 +599,7 @@
     CGFloat bannerHeigh = [height floatValue];
     
     [self.bannerView removeFromSuperview];
-    self.bannerView = [[BUNativeExpressBannerView alloc] initWithSlotID:@"945413865" rootViewController:self adSize:CGSizeMake(screenWidth, bannerHeigh) IsSupportDeepLink:YES];
+    self.bannerView = [[BUNativeExpressBannerView alloc] initWithSlotID:_bannerCodeId rootViewController:self adSize:CGSizeMake(screenWidth, bannerHeigh) IsSupportDeepLink:YES];
     self.bannerView.frame = CGRectMake(marginLeft, marginTop, screenWidth, bannerHeigh);
     self.bannerView.delegate = self;
   
@@ -646,7 +659,7 @@
         self.expressAdViews = [NSMutableArray arrayWithCapacity:20];
     }
     BUAdSlot *slot1 = [[BUAdSlot alloc] init];
-    slot1.ID = @"945198258";
+    slot1.ID = _nativeCodeId;
     slot1.AdType = BUAdSlotAdTypeFeed;
     BUSize *imgSize = [BUSize sizeBy:BUProposalSize_Feed228_150];
     slot1.imgSize = imgSize;

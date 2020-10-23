@@ -29,7 +29,7 @@
 #define StatusBarAndNavigationBarHeight (iPhoneX||iPhone11ProMax||iPhone11 ? 88.f : 64.f)
 #define TabbarHeight (iPhoneX||iPhone11ProMax||iPhone11 ? (49.f + 34.f) : (49.f))
 #define BottomSafeAreaHeight (iPhoneX||iPhone11ProMax||iPhone11 ? (34.f) : (0.f))
-#define MsmNavigationBarColor ([UIColor colorWithRed:57/255.0 green:58/255.0 blue:63/255.0 alpha:1])
+#define MsmNavigationBarColor ([UIColor colorWithRed:255.0 green:255.0 blue:255.0 alpha:1])
 
 
 

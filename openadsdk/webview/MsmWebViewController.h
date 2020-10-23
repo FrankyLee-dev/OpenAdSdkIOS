@@ -14,6 +14,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (copy,nonatomic) NSString *url;
 
+@property (nonatomic, assign) BOOL showToolbar;
+
+@property (copy,nonatomic) NSString *bannerCodeId;
+
+@property (copy,nonatomic) NSString *nativeCodeId;
+
+@property (copy,nonatomic) NSString *rewardVideoCodeId;
+
 @end
 
 NS_ASSUME_NONNULL_END
