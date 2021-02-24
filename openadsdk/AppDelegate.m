@@ -10,6 +10,8 @@
 #import "ViewController.h"
 #import "BUDMacros.h"
 #import <BUAdSDK/BUAdSDKManager.h>
+// GDT
+#import <GDTSDKConfig.h>
 
 @interface AppDelegate ()
 
@@ -29,6 +31,9 @@
 
     // initialize AD SDK
     [self setupBUAdSDK];
+    
+    // initialize GDT AD SDK
+    [self setupAdnetAdSDK];
     
     return YES;
 }
@@ -58,6 +63,23 @@
     [BUAdSDKManager setIsPaidApp:NO];
     
     [self loadBUSplashAd];
+}
+
+// 初始化广点通SDK
+- (void)setupAdnetAdSDK {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            BOOL result = [GDTSDKConfig registerAppId:@"1111322509"];
+            if (result) {
+              //广告控制
+//              if(self.showAd){
+//                //统计
+//                [self statistics];
+//              }
+            }
+        });
+    });
 }
 
 - (void)loadBUSplashAd

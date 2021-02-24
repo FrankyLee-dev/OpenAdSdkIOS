@@ -18,6 +18,7 @@
 		D761008424FE2386006085F8 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D761008024FE2386006085F8 /* ViewController.m */; };
 		D761008D24FE2C91006085F8 /* MtViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D761008C24FE2C91006085F8 /* MtViewController.m */; };
 		D76EE6AC25009E5E005E887E /* BUDExpressBannerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D76EE6AB25009E5E005E887E /* BUDExpressBannerViewController.m */; };
+		D77362EA25E62D510014C54C /* AdnetNative.m in Sources */ = {isa = PBXBuildFile; fileRef = D77362E825E62D510014C54C /* AdnetNative.m */; };
 		D7B693A0251AF68500DD43C0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D761008E24FE55AE006085F8 /* Images.xcassets */; };
 		D7DA99BD250617C6004C9A9F /* PopoverView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7DA99BC250617C6004C9A9F /* PopoverView.m */; };
 		D7DFF4B1254278C500B1B005 /* UIViewController+Hidden.m in Sources */ = {isa = PBXBuildFile; fileRef = D7DFF4B0254278C500B1B005 /* UIViewController+Hidden.m */; };
@@ -73,6 +74,8 @@
 		D76EE6AA25009E5E005E887E /* BUDExpressBannerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BUDExpressBannerViewController.h; sourceTree = "<group>"; };
 		D76EE6AB25009E5E005E887E /* BUDExpressBannerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BUDExpressBannerViewController.m; sourceTree = "<group>"; };
 		D76EE6B42500DE8D005E887E /* BUDMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BUDMacros.h; sourceTree = "<group>"; };
+		D77362E825E62D510014C54C /* AdnetNative.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AdnetNative.m; path = ../../../../../msmdsapp/ios/AdnetNative.m; sourceTree = "<group>"; };
+		D77362E925E62D510014C54C /* AdnetNative.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AdnetNative.h; path = ../../../../../msmdsapp/ios/AdnetNative.h; sourceTree = "<group>"; };
 		D7DA99BB250617C6004C9A9F /* PopoverView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PopoverView.h; sourceTree = "<group>"; };
 		D7DA99BC250617C6004C9A9F /* PopoverView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PopoverView.m; sourceTree = "<group>"; };
 		D7DFF4AF254278C500B1B005 /* UIViewController+Hidden.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Hidden.h"; sourceTree = "<group>"; };
@@ -197,6 +200,7 @@
 		D74CDF9424FDF23E008868CD /* webview */ = {
 			isa = PBXGroup;
 			children = (
+				D77362DC25E62BD70014C54C /* adnetDelegate */,
 				D74CDF9524FDF347008868CD /* MsmPrefixHeader.pch */,
 				D74CDF9624FDF3D9008868CD /* MsmWebViewController.h */,
 				D74CDF9724FDF3D9008868CD /* MsmWebViewController.m */,
@@ -223,6 +227,15 @@
 				D76EE6B42500DE8D005E887E /* BUDMacros.h */,
 			);
 			path = Macros;
+			sourceTree = "<group>";
+		};
+		D77362DC25E62BD70014C54C /* adnetDelegate */ = {
+			isa = PBXGroup;
+			children = (
+				D77362E925E62D510014C54C /* AdnetNative.h */,
+				D77362E825E62D510014C54C /* AdnetNative.m */,
+			);
+			path = adnetDelegate;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -466,6 +479,7 @@
 				D74CDF7224FDF055008868CD /* main.m in Sources */,
 				D7DA99BD250617C6004C9A9F /* PopoverView.m in Sources */,
 				D761008D24FE2C91006085F8 /* MtViewController.m in Sources */,
+				D77362EA25E62D510014C54C /* AdnetNative.m in Sources */,
 				D761008424FE2386006085F8 /* ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -646,7 +660,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.zhichan.openadsdk;
+				PRODUCT_BUNDLE_IDENTIFIER = cn.woepay.client.dist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -667,7 +681,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.zhichan.openadsdk;
+				PRODUCT_BUNDLE_IDENTIFIER = cn.woepay.client.dist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 1;
 			};

@@ -1,16 +1,28 @@
 PODS:
-  - Bytedance-UnionAD (3.1.0.5)
+  - Ads-CN (3.4.2.3):
+    - Ads-CN/BUAdSDK (= 3.4.2.3)
+  - Ads-CN/BUAdSDK (3.4.2.3):
+    - Ads-CN/BUFoundation
+    - Ads-CN/Domestic
+  - Ads-CN/BUFoundation (3.4.2.3)
+  - Ads-CN/Domestic (3.4.2.3)
+  - GDTMobSDK (4.12.3):
+    - GDTMobSDK/GDTMobSDK (= 4.12.3)
+  - GDTMobSDK/GDTMobSDK (4.12.3)
 
 DEPENDENCIES:
-  - Bytedance-UnionAD (~> 3.1.0.5)
+  - Ads-CN (= 3.4.2.3)
+  - GDTMobSDK (= 4.12.3)
 
 SPEC REPOS:
   trunk:
-    - Bytedance-UnionAD
+    - Ads-CN
+    - GDTMobSDK
 
 SPEC CHECKSUMS:
-  Bytedance-UnionAD: 4768919f6de97eb29687b8e50cee65eef5e9f3a9
+  Ads-CN: e73f0137d12d841eb2cfcfecbe75c0d3f74d5889
+  GDTMobSDK: 1e245a7a1f3960516fa8f5fb1038a349931dbd90
 
-PODFILE CHECKSUM: 07b2681d98fe3d8a6eb0b3fdb1cb0dc34a12ef0d
+PODFILE CHECKSUM: b7a8f09e4a0b0faf5ed2312a7fd76e91ff031af1
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.10.1

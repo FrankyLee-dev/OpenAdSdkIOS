@@ -33,13 +33,12 @@
 
 // 打开签到页
 -(void)openIntegral{
-    // http://192.168.0.222:8080/newSign
+    // http://192.168.31.222:8080/newSign
     // https://wxapp.msmds.cn/h5/react_web/newSign
     MsmWebViewController *msmWebController = [MsmWebViewController new];
-    msmWebController.url = @"https://wxapp.msmds.cn/h5/react_web/sign";
+    msmWebController.url = @"https://test.msmds.cn/h5/react_web/channel/newSign";
     msmWebController.showToolbar = YES;
     msmWebController.bannerCodeId = @"945413865";
-    msmWebController.nativeCodeId = @"945198258";
     msmWebController.rewardVideoCodeId = @"945198260";
     [self.navigationController pushViewController:msmWebController animated:YES];
     

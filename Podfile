@@ -5,8 +5,11 @@ target 'openadsdk' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  # Pods for openadsdk
-  pod 'Bytedance-UnionAD', '~> 3.1.0.5'
+  #  穿山甲AD
+    pod 'Ads-CN', '3.4.2.3'
+    
+    # 广点通AD
+    pod 'GDTMobSDK', '4.12.3'
 
   target 'openadsdkTests' do
     inherit! :search_paths

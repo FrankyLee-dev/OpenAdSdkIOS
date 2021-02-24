@@ -1,5 +1,4 @@
 //
-//  BUDExpressBannerViewController.h
 //  openadsdk
 //
 //  Created by Franky Lee on 2020/9/3.

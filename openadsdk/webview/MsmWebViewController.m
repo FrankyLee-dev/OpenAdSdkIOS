@@ -16,6 +16,11 @@
 #import "PopoverView.h"
 #import "UIViewController+Hidden.h"
 
+#import <GDTUnifiedBannerView.h>
+#import <GDTNativeExpressAd.h>
+#import <GDTNativeExpressAdView.h>
+#import "AdnetNative.h"
+
 #define URL_define @"URL"
 
 // WKWebView 内存不释放的问题解决
@@ -50,13 +55,14 @@
 @end
 
 @interface MsmWebViewController ()<
-    WKScriptMessageHandler,
-    WKUIDelegate,
-    WKNavigationDelegate,
-    BUNativeExpressBannerViewDelegate,
-    BUNativeExpressAdViewDelegate,
-    BUNativeExpressRewardedVideoAdDelegate,
-    PopoverViewDelegate
+WKScriptMessageHandler,
+WKUIDelegate,
+WKNavigationDelegate,
+BUNativeExpressBannerViewDelegate,
+BUNativeExpressAdViewDelegate,
+BUNativeExpressRewardedVideoAdDelegate,
+PopoverViewDelegate,
+AdnetNativeDelegate
 >
 
 @property(nonatomic, strong) WKWebView *webView;
@@ -72,6 +78,14 @@
 // 激励视频
 @property (nonatomic, strong) BUNativeExpressRewardedVideoAd *rewardedAd;
 
+// 广点通Banner2.0
+@property (nonatomic, strong) GDTUnifiedBannerView *gdtBannerView;
+// 广点通信息流
+@property (nonatomic, strong) AdnetNative *adNetNative;
+@property (nonatomic, strong) GDTNativeExpressAd *gdtNativeExpressAd;
+@property (nonatomic, strong) NSMutableArray *gdtExpressAdViews;
+@property (nonatomic, strong) UIView *gdtAdView;
+
 @end
 
 @implementation MsmWebViewController
@@ -80,7 +94,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setUpNavigationBar];
-    [self setupNavigationItem: NO];
+    //    [self setupNavigationItem: NO];
     self.expressAdViews = [NSMutableArray new];
     [self.view addSubview:self.webView];
     [self.view addSubview:self.progressView];
@@ -113,7 +127,7 @@
 
 - (void)viewSafeAreaInsetsDidChange {
     [super viewSafeAreaInsetsDidChange];
-//    UIEdgeInsets insets = self.view.safeAreaInsets;
+    //    UIEdgeInsets insets = self.view.safeAreaInsets;
     self.progressView.frame = CGRectMake(0, 0, self.view.frame.size.width, 3);
 }
 - (void)dealloc{
@@ -149,14 +163,24 @@
     // 去除导航栏底部黑色
     [self.navigationController.navigationBar setShadowImage:[[UIImage alloc] init]];
     
-    // 更多按钮
-    UIButton * moreButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [moreButton setImage:[[UIImage imageNamed:@"msm_more.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-    [moreButton addTarget:self action:@selector(moreAction:) forControlEvents:UIControlEventTouchUpInside];
-    moreButton.frame = CGRectMake(0, 0, 20, StatusBarAndNavigationBarHeight);
-    UIBarButtonItem * moreButtonItem = [[UIBarButtonItem alloc] initWithCustomView:moreButton];
+    // 后退按钮
+    UIButton * goBackButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    goBackButton.frame = CGRectMake(0, 0, 20, StatusBarAndNavigationBarHeight);
+    [goBackButton setImage:[[UIImage imageNamed:@"msm_back.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [goBackButton addTarget:self action:@selector(goBackAction:) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem * goBackButtonItem = [[UIBarButtonItem alloc] initWithCustomView:goBackButton];
+    self.navigationItem.leftBarButtonItems = @[goBackButtonItem];
     
-    self.navigationItem.rightBarButtonItems = @[moreButtonItem];
+    // 退出按钮
+    UIButton * exitButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [exitButton setImage:[[UIImage imageNamed:@"msm_cancel.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [exitButton addTarget:self action:@selector(exitAction:) forControlEvents:UIControlEventTouchUpInside];
+    exitButton.frame = CGRectMake(0, 0, 20, StatusBarAndNavigationBarHeight);
+    UIBarButtonItem * exitButtonItem = [[UIBarButtonItem alloc] initWithCustomView:exitButton];
+    
+    self.navigationItem.rightBarButtonItems = @[exitButtonItem];
+    
+    
 }
 
 #pragma mark - UI
@@ -190,7 +214,11 @@
 
 #pragma mark - Event Handle
 - (void)goBackAction:(id)sender{
-    [_webView goBack];
+    if ([_webView canGoBack]) {
+        [_webView goBack];
+    } else {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 - (void)moreAction:(id)sender{
@@ -236,7 +264,7 @@
         self.navigationItem.title = _webView.title;
     } else if([keyPath isEqualToString:@"URL"]){
         NSLog(@" 当前 URL------%@",_webView.URL.absoluteString);
-        [self setupNavigationItem:![_webView.URL.absoluteString isEqualToString:_url]];
+        //        [self setupNavigationItem:![_webView.URL.absoluteString isEqualToString:_url]];
     } else{
         [super observeValueForKeyPath:keyPath
                              ofObject:object
@@ -315,7 +343,10 @@
         NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
         [_webView loadRequest:request];
         
+        self.adNetNative = [[AdnetNative alloc] init];
+        self.adNetNative.delegate = self;
         
+        self.gdtAdView = [UIView new];
     }
     return _webView;
 }
@@ -402,22 +433,33 @@
             NSString * parameter = message.body;
             NSDictionary * adStyleData = [self dictionaryWithJsonString:parameter];
             NSDictionary *data = [adStyleData objectForKey:@"style"];
-            if (data != nil) {
+            NSString *adType = [adStyleData objectForKey:@"adType"];
+            NSString *iosCodeId = [adStyleData objectForKey:@"iosCodeId"];
+            NSLog(@"userContentController:%@",adType);
+            NSLog(@"userContentController:%@",iosCodeId);
+            if (data != nil && adType != nil && iosCodeId != nil) {
                 self.nativeTop = [data objectForKey:@"top"];
                 self.nativeLeft = [data objectForKey:@"left"];
                 NSString *top = [data objectForKey:@"top"];
                 NSString *left = [data objectForKey:@"left"];
                 NSString *width = [data objectForKey:@"width"];
                 NSString *height = [data objectForKey:@"height"];
-                [self loadNativeData:top:left:width:height];
+                NSLog(@"userContentController:%@",top);
+                NSLog(@"userContentController:%@",left);
+                NSLog(@"userContentController:%@",width);
+                [self loadNativeData:iosCodeId:adType:top:left:width:height];
             }
+            
         } else if ([message.name isEqualToString:@"dismissToutiaoNativeAd"]) {
             NSLog(@"userContentController:%@",@"dismissToutiaoNativeAd------");
-            // 移除信息流广告
+            // 移除穿山甲信息流广告
             BUNativeExpressAdView *expressAdView = [self.expressAdViews firstObject];
             [expressAdView removeFromSuperview];
             [self.expressAdViews removeAllObjects];
-
+            // 移除广点通信息流广告
+            [self.gdtAdView removeFromSuperview];
+            [self.gdtExpressAdViews removeAllObjects];
+            
         } else if ([message.name isEqualToString:@"loadToutiaoRewardVideoAd"]) {
             NSLog(@"userContentController:%@",@"loadToutiaoRewardVideoAd------");
             // 加载激励视频
@@ -517,7 +559,7 @@
     //允许跳转
     decisionHandler(WKNavigationResponsePolicyAllow);
     //不允许跳转
-//    decisionHandler(WKNavigationResponsePolicyCancel);
+    //    decisionHandler(WKNavigationResponsePolicyCancel);
 }
 
 //需要响应身份验证时调用 同样在block中需要传入用户身份凭证
@@ -599,10 +641,10 @@
     CGFloat bannerHeigh = [height floatValue];
     
     [self.bannerView removeFromSuperview];
-    self.bannerView = [[BUNativeExpressBannerView alloc] initWithSlotID:_bannerCodeId rootViewController:self adSize:CGSizeMake(screenWidth, bannerHeigh) IsSupportDeepLink:YES];
+    self.bannerView = [[BUNativeExpressBannerView alloc] initWithSlotID:_bannerCodeId rootViewController:self adSize:CGSizeMake(screenWidth, bannerHeigh)];
     self.bannerView.frame = CGRectMake(marginLeft, marginTop, screenWidth, bannerHeigh);
     self.bannerView.delegate = self;
-  
+    
     [self.bannerView loadAdData];
 }
 
@@ -651,30 +693,48 @@
 
 #pragma BUNativeExpressAdViewDelegate
 // 信息流广告
-- (void)loadNativeData:(NSString *)top :(NSString *)left :(NSString *)width :(NSString *)height {
+- (void)loadNativeData:(NSString *)codeId
+                      :(NSString *)adType
+                      :(NSString *)top
+                      :(NSString *)left
+                      :(NSString *)width
+                      :(NSString *)height
+{
     
     CGFloat screenWidth = [width floatValue];
-    CGFloat bannerHeigh = [height floatValue];
-    if (!self.expressAdViews) {
-        self.expressAdViews = [NSMutableArray arrayWithCapacity:20];
+    CGFloat screenHeight = [height floatValue];
+    NSLog(@"userContentController:%@",adType);
+    if ([adType isEqualToString:@"union"]) {
+        if (!self.expressAdViews) {
+            self.expressAdViews = [NSMutableArray arrayWithCapacity:20];
+        }
+        BUAdSlot *slot1 = [[BUAdSlot alloc] init];
+        slot1.ID = codeId;
+        slot1.AdType = BUAdSlotAdTypeFeed;
+        BUSize *imgSize = [BUSize sizeBy:BUProposalSize_Feed228_150];
+        slot1.imgSize = imgSize;
+        slot1.position = BUAdSlotPositionFeed;
+        
+        // self.nativeExpressAdManager可以重用
+        if (!self.nativeExpressAdManager) {
+            self.nativeExpressAdManager = [[BUNativeExpressAdManager alloc] initWithSlot:slot1 adSize:CGSizeMake(screenWidth, 0)];
+        }
+        self.nativeExpressAdManager.delegate = self;
+        [self.nativeExpressAdManager loadAdDataWithCount:1];
+        
+    } else if ([adType isEqualToString:@"adnet"]) {
+        
+        NSLog(@"userContentController:%@", @"load------");
+        
+        self.gdtNativeExpressAd = [[GDTNativeExpressAd alloc] initWithPlacementId:codeId
+                                                                           adSize:CGSizeMake(screenWidth, screenHeight)];
+        self.gdtNativeExpressAd.delegate = self.adNetNative;
+        [self.gdtNativeExpressAd loadAd:1];
     }
-    BUAdSlot *slot1 = [[BUAdSlot alloc] init];
-    slot1.ID = _nativeCodeId;
-    slot1.AdType = BUAdSlotAdTypeFeed;
-    BUSize *imgSize = [BUSize sizeBy:BUProposalSize_Feed228_150];
-    slot1.imgSize = imgSize;
-    slot1.position = BUAdSlotPositionFeed;
-    slot1.isSupportDeepLink = YES;
     
-    // self.nativeExpressAdManager可以重用
-    if (!self.nativeExpressAdManager) {
-        self.nativeExpressAdManager = [[BUNativeExpressAdManager alloc] initWithSlot:slot1 adSize:CGSizeMake(screenWidth, bannerHeigh)];
-    }
-    self.nativeExpressAdManager.adSize = CGSizeMake(screenWidth, bannerHeigh);
-    self.nativeExpressAdManager.delegate = self;
-    [self.nativeExpressAdManager loadAd:1];
 }
 
+#pragma mark - 穿山甲信息流广告代理----start
 - (void)nativeExpressAdSuccessToLoad:(BUNativeExpressAdManager *)nativeExpressAd views:(NSArray<__kindof BUNativeExpressAdView *> *)views {
     BUNativeExpressAdView *expressAdView = [self.expressAdViews firstObject];
     [expressAdView removeFromSuperview];
@@ -688,7 +748,7 @@
             [expressView render];
         }];
     }
-
+    
 }
 
 - (void)nativeExpressAdFailToLoad:(BUNativeExpressAdManager *)nativeExpressAd error:(NSError *)error {
@@ -704,8 +764,8 @@
 }
 
 - (void)nativeExpressAdView:(BUNativeExpressAdView *)nativeExpressAdView stateDidChanged:(BUPlayerPlayState)playerState {
-//    NSLog(@"====== %p playerState = %ld",nativeExpressAdView,(long)playerState);
-
+    //    NSLog(@"====== %p playerState = %ld",nativeExpressAdView,(long)playerState);
+    
 }
 
 - (void)nativeExpressAdViewRenderFail:(BUNativeExpressAdView *)nativeExpressAdView error:(NSError *)error {
@@ -748,6 +808,95 @@
         str = @"appstoreInApp";
     }
 }
+#pragma mark - 穿山甲信息流广告代理----end
+
+#pragma mark - 广点通信息流广告代理----start
+/**
+ * 拉取广告成功的回调
+ */
+- (void)adNetNativeExpressAdSuccessToLoad:(GDTNativeExpressAd *)nativeExpressAd views:(NSArray<__kindof GDTNativeExpressAdView *> *)views
+{
+    NSLog(@"adNetNativeExpressAdSuccessToLoad：%@",@"load ad success!");
+    [self.gdtExpressAdViews removeAllObjects];
+    self.gdtExpressAdViews = [NSMutableArray arrayWithArray:views];
+    if (self.gdtExpressAdViews.count) {
+        [self.gdtExpressAdViews enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            GDTNativeExpressAdView *expressView = (GDTNativeExpressAdView *)obj;
+            expressView.controller = self;
+            [expressView render];
+        }];
+    }
+}
+
+/**
+ * 拉取原生模板广告失败
+ */
+- (void)adNetNativeExpressAdFailToLoad:(GDTNativeExpressAd *)nativeExpressAd error:(NSError *)error
+{
+    NSLog(@"%s",__FUNCTION__);
+    NSLog(@"Express Ad Load Fail : %@",error);
+    [_webView evaluateJavaScript:@"javascript:window.NativeError();" completionHandler:nil];
+}
+
+- (void)adNetNativeExpressAdViewRenderSuccess:(GDTNativeExpressAdView *)nativeExpressAdView
+{
+    NSLog(@"Express Ad Render Success");
+    CGFloat marginTop = [self.nativeTop floatValue];
+    CGFloat marginLeft = [self.nativeLeft floatValue];
+    NSLog(@"Express Ad Render Success：%f", marginTop);
+    
+    [self.gdtAdView addSubview:nativeExpressAdView];
+    self.gdtAdView.frame = CGRectMake(marginLeft, marginTop, nativeExpressAdView.bounds.size.width, nativeExpressAdView.bounds.size.height);
+    [self.webView.scrollView addSubview:self.gdtAdView];
+    [_webView evaluateJavaScript:@"javascript:window.NativeRenderSuccess();" completionHandler:nil];
+}
+
+- (void)adNetNativeExpressAdViewClicked:(GDTNativeExpressAdView *)nativeExpressAdView
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+- (void)adNetNativeExpressAdViewClosed:(GDTNativeExpressAdView *)nativeExpressAdView
+{
+    NSLog(@"%s",__FUNCTION__);
+    [nativeExpressAdView removeFromSuperview];
+    [self.gdtExpressAdViews removeAllObjects];
+    [_webView evaluateJavaScript:@"javascript:window.NativeShield();" completionHandler:nil];
+}
+
+- (void)adNetNativeExpressAdViewExposure:(GDTNativeExpressAdView *)nativeExpressAdView
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+- (void)adNetNativeExpressAdViewWillPresentScreen:(GDTNativeExpressAdView *)nativeExpressAdView
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+- (void)adNetNativeExpressAdViewDidPresentScreen:(GDTNativeExpressAdView *)nativeExpressAdView
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+- (void)adNetNativeExpressAdViewWillDismissScreen:(GDTNativeExpressAdView *)nativeExpressAdView
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+- (void)adNetNativeExpressAdViewDidDismissScreen:(GDTNativeExpressAdView *)nativeExpressAdView
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+/**
+ * 详解:当点击应用下载或者广告调用系统程序打开时调用
+ */
+- (void)adNetNativeExpressAdViewApplicationWillEnterBackground:(GDTNativeExpressAdView *)nativeExpressAdView
+{
+    NSLog(@"--------%s-------",__FUNCTION__);
+}
+#pragma mark - 广点通信息流广告代理----end
 
 #pragma BUNativeExpressRewardedVideoAdDelegate
 // 激励视频
@@ -888,10 +1037,10 @@
     
     UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction * action) {
-                                                              //响应事件
-                                                              NSLog(@"action = %@", action);
-                                                          }];
-   
+        //响应事件
+        NSLog(@"action = %@", action);
+    }];
+    
     [alert addAction:defaultAction];
     [self presentViewController:alert animated:YES completion:nil];
 }
