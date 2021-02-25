@@ -38,8 +38,6 @@
     MsmWebViewController *msmWebController = [MsmWebViewController new];
     msmWebController.url = @"https://test.msmds.cn/h5/react_web/channel/newSign";
     msmWebController.showToolbar = YES;
-    msmWebController.bannerCodeId = @"945413865";
-    msmWebController.rewardVideoCodeId = @"945198260";
     [self.navigationController pushViewController:msmWebController animated:YES];
     
 }

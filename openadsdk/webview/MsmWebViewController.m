@@ -156,14 +156,23 @@ GDTUnifiedBannerViewDelegate
 
 #pragma mark - NavigationBar
 - (void)setUpNavigationBar{
+    BOOL isDark = false;
+    if (@available(iOS 13.0, *)) {
+        UIUserInterfaceStyle mode = UITraitCollection.currentTraitCollection.userInterfaceStyle;
+        if (mode == UIUserInterfaceStyleDark) {
+            NSLog(@"深色模式");
+            isDark = true;
+        }
+    }
+    
     // navigationBar背景色
-    [self.navigationController.navigationBar setBarTintColor:MsmNavigationBarColor];
+    [self.navigationController.navigationBar setBarTintColor:isDark? MsmNavigationBarDarkColor :MsmNavigationBarColor];
     // 控件颜色
-    [self.navigationController.navigationBar setTintColor:[UIColor blackColor]];
+    [self.navigationController.navigationBar setTintColor:isDark ? [UIColor whiteColor]:[UIColor blackColor]];
     // 设置标题
     [self.navigationController.navigationBar setTitleTextAttributes:@{
         NSFontAttributeName:[UIFont systemFontOfSize: 16 weight:UIFontWeightMedium],
-        NSForegroundColorAttributeName:[UIColor blackColor]
+        NSForegroundColorAttributeName:isDark ? [UIColor whiteColor] : [UIColor blackColor]
     }];
     // 默认（YES）
     [self.navigationController.navigationBar setTranslucent:NO];
@@ -173,14 +182,14 @@ GDTUnifiedBannerViewDelegate
     // 后退按钮
     UIButton * goBackButton = [UIButton buttonWithType:UIButtonTypeCustom];
     goBackButton.frame = CGRectMake(0, 0, 20, StatusBarAndNavigationBarHeight);
-    [goBackButton setImage:[[UIImage imageNamed:@"msm_back.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [goBackButton setImage:[[UIImage imageNamed:@"msmdsresource.bundle/msm_back"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [goBackButton addTarget:self action:@selector(goBackAction:) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem * goBackButtonItem = [[UIBarButtonItem alloc] initWithCustomView:goBackButton];
     self.navigationItem.leftBarButtonItems = @[goBackButtonItem];
     
     // 退出按钮
     UIButton * exitButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [exitButton setImage:[[UIImage imageNamed:@"msm_cancel.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [exitButton setImage:[[UIImage imageNamed:@"msmdsresource.bundle/msm_cancel"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [exitButton addTarget:self action:@selector(exitAction:) forControlEvents:UIControlEventTouchUpInside];
     exitButton.frame = CGRectMake(0, 0, 20, StatusBarAndNavigationBarHeight);
     UIBarButtonItem * exitButtonItem = [[UIBarButtonItem alloc] initWithCustomView:exitButton];
@@ -194,14 +203,14 @@ GDTUnifiedBannerViewDelegate
 - (void)setupNavigationItem:(BOOL)showBack{
     
     UIButton * exitButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [exitButton setImage:[[UIImage imageNamed:@"msm_cancel.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [exitButton setImage:[[UIImage imageNamed:@"msmdsresource.bundle/msm_cancel"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [exitButton addTarget:self action:@selector(exitAction:) forControlEvents:UIControlEventTouchUpInside];
     
     if (showBack) {
         // 后退按钮
         UIButton * goBackButton = [UIButton buttonWithType:UIButtonTypeCustom];
         goBackButton.frame = CGRectMake(0, 0, 20, StatusBarAndNavigationBarHeight);
-        [goBackButton setImage:[[UIImage imageNamed:@"msm_back.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+        [goBackButton setImage:[[UIImage imageNamed:@"msmdsresource.bundle/msm_back"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
         [goBackButton addTarget:self action:@selector(goBackAction:) forControlEvents:UIControlEventTouchUpInside];
         UIBarButtonItem * goBackButtonItem = [[UIBarButtonItem alloc] initWithCustomView:goBackButton];
         
@@ -670,7 +679,7 @@ GDTUnifiedBannerViewDelegate
     
     if ([adType isEqualToString:@"union"]) {
         [self.bannerView removeFromSuperview];
-        self.bannerView = [[BUNativeExpressBannerView alloc] initWithSlotID:_bannerCodeId rootViewController:self adSize:CGSizeMake(screenWidth, bannerHeigh)];
+        self.bannerView = [[BUNativeExpressBannerView alloc] initWithSlotID:codeId rootViewController:self adSize:CGSizeMake(screenWidth, bannerHeigh)];
         self.bannerView.frame = CGRectMake(marginLeft, marginTop, screenWidth, bannerHeigh);
         self.bannerView.delegate = self;
         
