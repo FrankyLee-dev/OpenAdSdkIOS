@@ -19,6 +19,8 @@
 #import <GDTUnifiedBannerView.h>
 #import <GDTNativeExpressAd.h>
 #import <GDTNativeExpressAdView.h>
+#import <GDTRewardVideoAd.h>
+#import <GDTUnifiedBannerView.h>
 #import "AdnetNative.h"
 
 #define URL_define @"URL"
@@ -62,7 +64,9 @@ BUNativeExpressBannerViewDelegate,
 BUNativeExpressAdViewDelegate,
 BUNativeExpressRewardedVideoAdDelegate,
 PopoverViewDelegate,
-AdnetNativeDelegate
+AdnetNativeDelegate,
+GDTRewardedVideoAdDelegate,
+GDTUnifiedBannerViewDelegate
 >
 
 @property(nonatomic, strong) WKWebView *webView;
@@ -85,6 +89,9 @@ AdnetNativeDelegate
 @property (nonatomic, strong) GDTNativeExpressAd *gdtNativeExpressAd;
 @property (nonatomic, strong) NSMutableArray *gdtExpressAdViews;
 @property (nonatomic, strong) UIView *gdtAdView;
+
+// 广点通激励视频
+@property (nonatomic, strong) GDTRewardVideoAd *gdtRewardVideoAd;
 
 @end
 
@@ -412,21 +419,25 @@ AdnetNativeDelegate
         if([message.name isEqualToString:@"showToutiaoBannerAd"]){
             NSLog(@"userContentController:%@",@"showToutiaoBannerAd------");
             // 解析style，加载显示banner广告
-            //用message.body获得JS传出的参数体
             NSString * parameter = message.body;
             NSDictionary * adStyleData = [self dictionaryWithJsonString:parameter];
             NSDictionary *data = [adStyleData objectForKey:@"style"];
-            if (data != nil) {
+            NSString *adType = [adStyleData objectForKey:@"adType"];
+            NSString *iosCodeId = [adStyleData objectForKey:@"iosCodeId"];
+            NSLog(@"userContentController:%@",adType);
+            NSLog(@"userContentController:%@",iosCodeId);
+            if (data != nil && adType != nil && iosCodeId != nil) {
                 NSString *top = [data objectForKey:@"top"];
                 NSString *left = [data objectForKey:@"left"];
                 NSString *width = [data objectForKey:@"width"];
                 NSString *height = [data objectForKey:@"height"];
-                [self loadData:top:left:width:height];
+                [self loadBannerData:iosCodeId:adType:top:left:width:height];
             }
         }else if([message.name isEqualToString:@"dismissToutiaoBannerAd"]){
             // 移除banner广告
             NSLog(@"userContentController:%@",@"dismissToutiaoBannerAd------");
             [self.bannerView removeFromSuperview];
+            [self.gdtBannerView removeFromSuperview];
         } else if ([message.name isEqualToString:@"showToutiaoNativeAd"]) {
             NSLog(@"userContentController:%@",@"showToutiaoNativeAd------");
             // 解析style，加载显示信息流广告
@@ -463,11 +474,22 @@ AdnetNativeDelegate
         } else if ([message.name isEqualToString:@"loadToutiaoRewardVideoAd"]) {
             NSLog(@"userContentController:%@",@"loadToutiaoRewardVideoAd------");
             // 加载激励视频
-            [self loadRewardVideoAdWithSlotID:_rewardVideoCodeId];
+            NSString * parameter = message.body;
+            NSDictionary * adStyleData = [self dictionaryWithJsonString:parameter];
+            NSString *adType = [adStyleData objectForKey:@"adType"];
+            NSString *iosCodeId = [adStyleData objectForKey:@"iosCodeId"];
+            NSLog(@"userContentController:%@", adType);
+            NSLog(@"userContentController:%@", iosCodeId);
+            if (adType != nil && iosCodeId != nil) {
+                [self loadRewardVideoAdWithSlotID:iosCodeId:adType];
+            }
         } else if ([message.name isEqualToString:@"playToutiaoRewardVideoAd"]) {
             NSLog(@"userContentController:%@",@"playToutiaoRewardVideoAd------");
             // 播放激励视频
-            [self showRewardVideoAd];
+            NSString * parameter = message.body;
+            NSDictionary * adStyleData = [self dictionaryWithJsonString:parameter];
+            NSString *adType = [adStyleData objectForKey:@"adType"];
+            [self showRewardVideoAd:adType];
         }
     } @catch (NSException *exception) {
         NSLog(@"NSException%@",exception);
@@ -633,21 +655,45 @@ AdnetNativeDelegate
 
 
 #pragma BUNativeExpressBannerViewDelegate
-- (void)loadData:(NSString *)top :(NSString *)left :(NSString *)width :(NSString *)height {
+- (void)loadBannerData:(NSString *)codeId
+                      :(NSString *)adType
+                      :(NSString *)top
+                      :(NSString *)left
+                      :(NSString *)width
+                      :(NSString *)height
+{
     
     CGFloat marginTop = [top floatValue];
     CGFloat marginLeft = [left floatValue];
     CGFloat screenWidth = [width floatValue];
     CGFloat bannerHeigh = [height floatValue];
     
-    [self.bannerView removeFromSuperview];
-    self.bannerView = [[BUNativeExpressBannerView alloc] initWithSlotID:_bannerCodeId rootViewController:self adSize:CGSizeMake(screenWidth, bannerHeigh)];
-    self.bannerView.frame = CGRectMake(marginLeft, marginTop, screenWidth, bannerHeigh);
-    self.bannerView.delegate = self;
+    if ([adType isEqualToString:@"union"]) {
+        [self.bannerView removeFromSuperview];
+        self.bannerView = [[BUNativeExpressBannerView alloc] initWithSlotID:_bannerCodeId rootViewController:self adSize:CGSizeMake(screenWidth, bannerHeigh)];
+        self.bannerView.frame = CGRectMake(marginLeft, marginTop, screenWidth, bannerHeigh);
+        self.bannerView.delegate = self;
+        
+        [self.bannerView loadAdData];
+    } else if ([adType isEqualToString:@"adnet"]) {
+        if (self.gdtBannerView.superview) {
+            [self.gdtBannerView removeFromSuperview];
+            self.gdtBannerView = nil;
+        }
+        self.gdtBannerView = [[GDTUnifiedBannerView alloc]
+                       initWithFrame:CGRectMake(marginLeft, marginTop, screenWidth, screenWidth/6.4)
+                       placementId:codeId
+                       viewController:self];
+        self.gdtBannerView.accessibilityIdentifier = @"banner_ad";
+        self.gdtBannerView.animated = YES;
+        self.gdtBannerView.autoSwitchInterval = 30;
+        self.gdtBannerView.delegate = self;
+        [self.gdtBannerView loadAdAndShow];
+    }
     
-    [self.bannerView loadAdData];
 }
 
+#pragma mark - 穿山甲Banner广告代理----start
 - (void)nativeExpressBannerAdViewDidLoad:(BUNativeExpressBannerView *)bannerAdView {
     NSLog(@"%s",__func__);
 }
@@ -689,7 +735,106 @@ AdnetNativeDelegate
         }
     }];
 }
+#pragma mark - 穿山甲Banner广告代理----end
 
+#pragma mark - 广点通Banner广告代理----start
+/**
+ *  请求广告条数据成功后调用
+ *  当接收服务器返回的广告数据成功后调用该函数
+ */
+- (void)unifiedBannerViewDidLoad:(GDTUnifiedBannerView *)unifiedBannerView
+{
+    NSLog(@"%s",__FUNCTION__);
+    NSLog(@"unified banner did load");
+}
+
+/**
+ *  请求广告条数据失败后调用
+ *  当接收服务器返回的广告数据失败后调用该函数
+ */
+
+- (void)unifiedBannerViewFailedToLoad:(GDTUnifiedBannerView *)unifiedBannerView error:(NSError *)error
+{
+    NSLog(@"%s",__FUNCTION__);
+    [_webView evaluateJavaScript:@"javascript:window.BannerLoadError();" completionHandler:nil];
+}
+
+/**
+ *  banner2.0曝光回调
+ */
+- (void)unifiedBannerViewWillExpose:(nonnull GDTUnifiedBannerView *)unifiedBannerView {
+    NSLog(@"%s",__FUNCTION__);
+    CGFloat height = unifiedBannerView.bounds.size.height;
+    [self.webView.scrollView addSubview:self.gdtBannerView];
+    NSString *jsStr = [NSString stringWithFormat:@"javascript:window.BannerLoadSuccess({height:%g});",height];
+    [_webView evaluateJavaScript:jsStr completionHandler:nil];
+}
+
+/**
+ *  banner2.0点击回调
+ */
+- (void)unifiedBannerViewClicked:(GDTUnifiedBannerView *)unifiedBannerView
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+/**
+ *  应用进入后台时调用
+ *  当点击应用下载或者广告调用系统程序打开，应用将被自动切换到后台
+ */
+- (void)unifiedBannerViewWillLeaveApplication:(GDTUnifiedBannerView *)unifiedBannerView
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+/**
+ *  全屏广告页已经被关闭
+ */
+- (void)unifiedBannerViewDidDismissFullScreenModal:(GDTUnifiedBannerView *)unifiedBannerView
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+/**
+ *  全屏广告页即将被关闭
+ */
+- (void)unifiedBannerViewWillDismissFullScreenModal:(GDTUnifiedBannerView *)unifiedBannerView
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+/**
+ *  banner2.0广告点击以后即将弹出全屏广告页
+ */
+- (void)unifiedBannerViewWillPresentFullScreenModal:(GDTUnifiedBannerView *)unifiedBannerView
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+/**
+ *  banner2.0广告点击以后弹出全屏广告页完毕
+ */
+- (void)unifiedBannerViewDidPresentFullScreenModal:(GDTUnifiedBannerView *)unifiedBannerView
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+/**
+ *  banner2.0被用户关闭时调用
+ */
+- (void)unifiedBannerViewWillClose:(nonnull GDTUnifiedBannerView *)unifiedBannerView {
+    [_webView evaluateJavaScript:@"javascript:window.BannerHideManually();" completionHandler:nil];
+    [UIView animateWithDuration:0.25 animations:^{
+        unifiedBannerView.alpha = 0;
+    } completion:^(BOOL finished) {
+        [unifiedBannerView removeFromSuperview];
+        if (self.gdtBannerView == unifiedBannerView) {
+            self.gdtBannerView = nil;
+        }
+    }];
+    NSLog(@"%s",__FUNCTION__);
+}
+#pragma mark - 广点通Banner广告代理----end
 
 #pragma BUNativeExpressAdViewDelegate
 // 信息流广告
@@ -900,21 +1045,44 @@ AdnetNativeDelegate
 
 #pragma BUNativeExpressRewardedVideoAdDelegate
 // 激励视频
-- (void)loadRewardVideoAdWithSlotID:(NSString *)slotID {
-    BURewardedVideoModel *model = [[BURewardedVideoModel alloc] init];
-    model.userId = @"13374";
-    self.rewardedAd = [[BUNativeExpressRewardedVideoAd alloc] initWithSlotID:slotID rewardedVideoModel:model];
-    self.rewardedAd.delegate = self;
-    [self.rewardedAd loadAdData];
-    //为保证播放流畅建议可在收到视频下载完成回调后再展示视频。
+- (void)loadRewardVideoAdWithSlotID:(NSString *)codeId
+                                   :(NSString *)adType
+{
+    if ([adType isEqualToString:@"union"]) {
+        BURewardedVideoModel *model = [[BURewardedVideoModel alloc] init];
+        model.userId = @"13374";
+        self.rewardedAd = [[BUNativeExpressRewardedVideoAd alloc] initWithSlotID:codeId rewardedVideoModel:model];
+        self.rewardedAd.delegate = self;
+        [self.rewardedAd loadAdData];
+        //为保证播放流畅建议可在收到视频下载完成回调后再展示视频。
+    } else if ([adType isEqualToString:@"adnet"]) {
+        self.gdtRewardVideoAd = [[GDTRewardVideoAd alloc] initWithPlacementId:codeId];
+        self.gdtRewardVideoAd.videoMuted = YES;
+        self.gdtRewardVideoAd.delegate = self;
+        //如果设置了服务端验证，可以设置serverSideVerificationOptions属性
+//        GDTServerSideVerificationOptions *ssv = [[GDTServerSideVerificationOptions alloc] init];
+//        ssv.userIdentifier = @"APP's user id for server verify";
+//        ssv.customRewardString = @"APP's custom data";
+//        self.gdtRewardVideoAd.serverSideVerificationOptions = ssv;
+        [self.gdtRewardVideoAd loadAd];
+    }
+    
 }
 // 播放视频
-- (void)showRewardVideoAd {
-    if (self.rewardedAd) {
-        [self.rewardedAd showAdFromRootViewController:self];
+- (void)showRewardVideoAd:(NSString *)adType {
+    if ([adType isEqualToString:@"union"]) {
+        if (self.rewardedAd) {
+            [self.rewardedAd showAdFromRootViewController:self];
+        }
+    } else if ([adType isEqualToString:@"adnet"]) {
+        if (self.gdtRewardVideoAd.isAdValid) {
+            [self.gdtRewardVideoAd showAdFromRootViewController:self];
+        }
     }
+    
 }
 
+#pragma 穿山甲激励视频代理---start
 - (void)nativeExpressRewardedVideoAdDidLoad:(BUNativeExpressRewardedVideoAd *)rewardedVideoAd {
     
 }
@@ -986,6 +1154,89 @@ AdnetNativeDelegate
     }
     
 }
+#pragma 穿山甲激励视频代理---end
+
+#pragma 广点通激励视频代理---start
+- (void)gdt_rewardVideoAdDidLoad:(GDTRewardVideoAd *)rewardedVideoAd
+{
+    NSLog(@"gdt_rewardVideoAdDidLoad:%@",@"广告数据加载成功");
+    NSLog(@"eCPM:%ld eCPMLevel:%@", [rewardedVideoAd eCPM], [rewardedVideoAd eCPMLevel]);
+    NSLog(@"videoDuration :%lf rewardAdType:%ld", rewardedVideoAd.videoDuration, rewardedVideoAd.rewardAdType);
+}
+
+- (void)gdt_rewardVideoAdVideoDidLoad:(GDTRewardVideoAd *)rewardedVideoAd
+{
+    NSLog(@"gdt_rewardVideoAdDidLoad:%@",@"视频文件加载成功");
+}
+
+- (void)gdt_rewardVideoAdWillVisible:(GDTRewardVideoAd *)rewardedVideoAd
+{
+    NSLog(@"%s",__FUNCTION__);
+    NSLog(@"视频播放页即将打开");
+}
+
+- (void)gdt_rewardVideoAdDidExposed:(GDTRewardVideoAd *)rewardedVideoAd
+{
+    NSLog(@"%s",__FUNCTION__);
+    NSLog(@"广告已曝光");
+}
+
+- (void)gdt_rewardVideoAdDidClose:(GDTRewardVideoAd *)rewardedVideoAd
+{
+    NSLog(@"%s",__FUNCTION__);
+//    广告关闭后释放ad对象
+    self.gdtRewardVideoAd = nil;
+    NSLog(@"广告已关闭");
+}
+
+
+- (void)gdt_rewardVideoAdDidClicked:(GDTRewardVideoAd *)rewardedVideoAd
+{
+    NSLog(@"%s",__FUNCTION__);
+    NSLog(@"广告已点击");
+}
+
+- (void)gdt_rewardVideoAd:(GDTRewardVideoAd *)rewardedVideoAd didFailWithError:(NSError *)error
+{
+    NSLog(@"%s",__FUNCTION__);
+    [_webView evaluateJavaScript:@"javascript:window.onRewardError();" completionHandler:nil];
+    if (error.code == 4014) {
+        NSLog(@"请拉取到广告后再调用展示接口");
+    } else if (error.code == 4016) {
+        NSLog(@"应用方向与广告位支持方向不一致");
+    } else if (error.code == 5012) {
+        NSLog(@"广告已过期");
+    } else if (error.code == 4015) {
+        NSLog(@"广告已经播放过，请重新拉取");
+    } else if (error.code == 5002) {
+        NSLog(@"视频下载失败");
+    } else if (error.code == 5003) {
+        NSLog(@"视频播放失败");
+    } else if (error.code == 5004) {
+        NSLog(@"没有合适的广告");
+    } else if (error.code == 5013) {
+        NSLog(@"请求太频繁，请稍后再试");
+    } else if (error.code == 3002) {
+        NSLog(@"网络连接超时");
+    } else if (error.code == 5027){
+        NSLog(@"页面加载失败");
+    }
+    NSLog(@"ERROR: %@", error);
+}
+
+- (void)gdt_rewardVideoAdDidRewardEffective:(GDTRewardVideoAd *)rewardedVideoAd info:(NSDictionary *)info {
+    NSLog(@"%s",__FUNCTION__);
+    NSLog(@"播放达到激励条件 transid:%@", [info objectForKey:@"GDT_TRANS_ID"]);
+    [_webView evaluateJavaScript:@"javascript:window.onRewardVerify();" completionHandler:nil];
+}
+
+- (void)gdt_rewardVideoAdDidPlayFinish:(GDTRewardVideoAd *)rewardedVideoAd
+{
+    NSLog(@"%s",__FUNCTION__);
+    NSLog(@"视频播放结束");
+}
+
+#pragma 广点通激励视频代理---end
 
 #pragma mark - PopoverViewDelegate
 - (void)didSelectedRowAtIndex:(NSInteger)index{
